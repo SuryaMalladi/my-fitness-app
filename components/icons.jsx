@@ -1,0 +1,50 @@
+// Shared icon set — minimal stroked icons
+const Icon = ({ name, size = 20, color = 'currentColor', strokeWidth = 1.75 }) => {
+  const s = { width: size, height: size, stroke: color, strokeWidth, fill: 'none', strokeLinecap: 'round', strokeLinejoin: 'round' };
+  const paths = {
+    home: <><path d="M3 11l9-8 9 8v10a1 1 0 01-1 1h-5v-7h-6v7H4a1 1 0 01-1-1V11z"/></>,
+    flame: <><path d="M12 2.5c1.5 2.5 4.5 4 4.5 7.5 0 1.5-.5 2.5-1 3.5 2 .5 3.5 2.5 3.5 5 0 3.5-3 6-7 6s-7-2.5-7-6c0-2.5 1.5-4 3-5-.5-1-.5-2 0-3 1 1 2 1 2.5.5-.5-1.5 0-3 1-4 0 1 1 2 2 2-.5-2 .5-4.5-1.5-6.5z"/></>,
+    drop: <><path d="M12 2.5c-3 4-6 7.5-6 11.5a6 6 0 0012 0c0-4-3-7.5-6-11.5z"/></>,
+    dumbbell: <><path d="M3 9v6M7 6v12M17 6v12M21 9v6M7 12h10"/></>,
+    plate: <><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4"/></>,
+    plus: <><path d="M12 5v14M5 12h14"/></>,
+    bell: <><path d="M6 8a6 6 0 0112 0c0 4 1.5 5 2.5 6.5H3.5C4.5 13 6 12 6 8zM10 19a2 2 0 004 0"/></>,
+    camera: <><path d="M4 8h3l2-2.5h6L17 8h3a1 1 0 011 1v10a1 1 0 01-1 1H4a1 1 0 01-1-1V9a1 1 0 011-1z"/><circle cx="12" cy="13" r="3.5"/></>,
+    mic: <><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v3"/></>,
+    barcode: <><path d="M3 6v12M6 6v12M9 6v12M12 6v12M15 6v12M18 6v12M21 6v12" strokeWidth="1.2"/></>,
+    search: <><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></>,
+    upload: <><path d="M12 16V4M7 9l5-5 5 5M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/></>,
+    check: <><path d="M4 12l5 5L20 6"/></>,
+    checkCircle: <><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></>,
+    x: <><path d="M6 6l12 12M6 18L18 6"/></>,
+    play: <><path d="M7 4v16l13-8z" fill={color}/></>,
+    pause: <><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></>,
+    chart: <><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></>,
+    calendar: <><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></>,
+    chevronR: <><path d="M9 6l6 6-6 6"/></>,
+    chevronL: <><path d="M15 6l-6 6 6 6"/></>,
+    chevronD: <><path d="M6 9l6 6 6-6"/></>,
+    chevronU: <><path d="M6 15l6-6 6 6"/></>,
+    gear: <><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2 2M17.8 17.8l2 2M2 12h3M19 12h3M4.2 19.8l2-2M17.8 6.2l2-2"/></>,
+    user: <><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.5 3.5-8 8-8s8 3.5 8 8"/></>,
+    timer: <><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/></>,
+    zap: <><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/></>,
+    heart: <><path d="M12 21s-8-5-8-11a5 5 0 019-3 5 5 0 019 3c0 6-8 11-8 11z"/></>,
+    trophy: <><path d="M6 4h12v3a6 6 0 01-12 0V4zM6 4H3v2a3 3 0 003 3M18 4h3v2a3 3 0 01-3 3M10 16h4M12 13v3M8 20h8"/></>,
+    arrow: <><path d="M5 12h14M13 6l6 6-6 6"/></>,
+    trend: <><path d="M3 17l6-6 4 4 8-9M14 6h7v7"/></>,
+    list: <><path d="M3 6h18M3 12h18M3 18h18" strokeWidth="1.5"/></>,
+    sparkle: <><path d="M12 3v6M12 15v6M3 12h6M15 12h6M6 6l4 4M14 14l4 4M18 6l-4 4M10 14l-4 4" strokeWidth="1.3"/></>,
+    file: <><path d="M14 3H6a1 1 0 00-1 1v16a1 1 0 001 1h12a1 1 0 001-1V8l-5-5zM14 3v5h5"/></>,
+    image: <><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="M5 17l5-5 4 4 3-3 2 2"/></>,
+    mail: <><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 7 9-7"/></>,
+    alert: <><path d="M12 3l10 17H2L12 3zM12 10v5M12 18v.01"/></>,
+    repeat: <><path d="M17 3l4 4-4 4M3 11V9a4 4 0 014-4h14M7 21l-4-4 4-4M21 13v2a4 4 0 01-4 4H3"/></>,
+    moon: <><path d="M20 14A8 8 0 1110 4a7 7 0 0010 10z"/></>,
+    sun: <><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4 12H2M22 12h-2M5 5l1.5 1.5M17.5 17.5L19 19M5 19l1.5-1.5M17.5 6.5L19 5"/></>,
+    external: <><path d="M18 13v6a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1h6M15 3h6v6M10 14L21 3"/></>,
+  };
+  return <svg viewBox="0 0 24 24" style={s}>{paths[name]}</svg>;
+};
+
+window.Icon = Icon;

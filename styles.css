@@ -1,0 +1,208 @@
+/* ————— Fitness App — Dark Wellness Design System ————— */
+
+:root {
+  /* Surfaces */
+  --bg-0: #0A0D0C;
+  --bg-1: #0F1312;
+  --bg-2: #15191A;
+  --bg-3: #1C2122;
+  --bg-4: #242A2B;
+
+  /* Borders / dividers */
+  --line: rgba(255,255,255,0.06);
+  --line-strong: rgba(255,255,255,0.10);
+
+  /* Text */
+  --t-1: #F1F3F2;
+  --t-2: rgba(241,243,242,0.68);
+  --t-3: rgba(241,243,242,0.44);
+  --t-4: rgba(241,243,242,0.26);
+
+  /* Accents — all same chroma/lightness family */
+  --lime: oklch(0.86 0.17 128);
+  --lime-dim: oklch(0.86 0.17 128 / 0.14);
+  --lime-bright: oklch(0.92 0.19 128);
+
+  --amber: oklch(0.82 0.16 72);
+  --amber-dim: oklch(0.82 0.16 72 / 0.14);
+
+  --aqua: oklch(0.78 0.12 225);
+  --aqua-dim: oklch(0.78 0.12 225 / 0.14);
+
+  --rose: oklch(0.72 0.17 20);
+  --rose-dim: oklch(0.72 0.17 20 / 0.14);
+
+  --violet: oklch(0.74 0.13 290);
+  --violet-dim: oklch(0.74 0.13 290 / 0.14);
+
+  /* Type */
+  --sans: 'Inter', -apple-system, system-ui, sans-serif;
+  --serif: 'Instrument Serif', 'Cormorant Garamond', Georgia, serif;
+  --mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* Density (tweakable) */
+  --pad: 20px;
+  --gap: 14px;
+  --radius-card: 22px;
+  --radius-pill: 999px;
+}
+
+[data-density="compact"] {
+  --pad: 14px;
+  --gap: 10px;
+  --radius-card: 16px;
+}
+
+* { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+
+body {
+  margin: 0;
+  background: #050706;
+  color: var(--t-1);
+  font-family: var(--sans);
+  font-feature-settings: "ss01", "cv11";
+  letter-spacing: -0.01em;
+}
+
+/* ————— Primitives ————— */
+
+.card {
+  background: var(--bg-2);
+  border: 0.5px solid var(--line);
+  border-radius: var(--radius-card);
+  padding: var(--pad);
+}
+
+.card-ghost {
+  background: var(--bg-1);
+  border: 0.5px solid var(--line);
+  border-radius: var(--radius-card);
+  padding: var(--pad);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  background: var(--bg-3);
+  color: var(--t-2);
+}
+
+.chip.lime { background: var(--lime-dim); color: var(--lime-bright); }
+.chip.amber { background: var(--amber-dim); color: var(--amber); }
+.chip.aqua { background: var(--aqua-dim); color: var(--aqua); }
+.chip.rose { background: var(--rose-dim); color: var(--rose); }
+
+.hero-num {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-feature-settings: "lnum", "tnum";
+  letter-spacing: -0.02em;
+  line-height: 0.9;
+}
+
+.label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--t-3);
+}
+
+.coach-quote {
+  font-family: var(--serif);
+  font-size: 22px;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--t-1);
+}
+
+/* ————— Buttons ————— */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 8px;
+  padding: 14px 18px;
+  border-radius: 14px;
+  font-size: 15px; font-weight: 600;
+  border: none; cursor: pointer;
+  font-family: inherit; letter-spacing: -0.01em;
+  transition: transform .12s ease, background .15s ease;
+}
+.btn:active { transform: scale(0.97); }
+
+.btn-lime { background: var(--lime); color: #0A0D0C; }
+.btn-lime:hover { background: var(--lime-bright); }
+.btn-ghost { background: var(--bg-3); color: var(--t-1); }
+.btn-ghost:hover { background: var(--bg-4); }
+
+/* ————— Progress ————— */
+.bar {
+  height: 6px; border-radius: 999px; background: var(--bg-3);
+  overflow: hidden;
+}
+.bar > span { display: block; height: 100%; border-radius: 999px; background: var(--lime); }
+
+/* ————— Scrollbars ————— */
+.hide-scroll::-webkit-scrollbar { display: none; }
+.hide-scroll { scrollbar-width: none; }
+
+/* ————— Animations ————— */
+@keyframes breathe {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50%      { transform: scale(1.05); opacity: 1; }
+}
+@keyframes ripple {
+  0%   { transform: translateY(0) scaleX(1); }
+  50%  { transform: translateY(-2px) scaleX(1.02); }
+  100% { transform: translateY(0) scaleX(1); }
+}
+@keyframes fillUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(var(--fill, 40%)); }
+}
+@keyframes dash {
+  to { stroke-dashoffset: var(--dash-to, 0); }
+}
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes pulse-ring {
+  0% { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(2); opacity: 0; }
+}
+
+/* ————— Web Dashboard ————— */
+.web-surface {
+  background: radial-gradient(ellipse at top left, #10201C 0%, #050706 55%);
+  min-height: 100vh;
+}
+
+/* Tab bar */
+.tabbar {
+  display: flex; align-items: center; justify-content: space-around;
+  padding: 10px 8px 6px;
+  background: linear-gradient(to top, rgba(10,13,12,0.98) 60%, rgba(10,13,12,0.5));
+  backdrop-filter: blur(20px);
+  border-top: 0.5px solid var(--line);
+}
+.tab {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 6px 12px; border-radius: 12px;
+  font-size: 10px; font-weight: 500; color: var(--t-3);
+  background: transparent; border: none; cursor: pointer;
+  font-family: inherit;
+}
+.tab.active { color: var(--lime); }
+
+/* No focus outline on mocked buttons */
+button:focus { outline: none; }

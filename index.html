@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Coach — Surya's Wellness</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg-0:#0A0D0C; --bg-1:#0F1312; --bg-2:#15191A; --bg-3:#1C2122; --bg-4:#242A2B;
+  --line:rgba(255,255,255,0.06); --line-s:rgba(255,255,255,0.12);
+  --t-1:#F1F3F2; --t-2:rgba(241,243,242,0.68); --t-3:rgba(241,243,242,0.44); --t-4:rgba(241,243,242,0.26);
+  --lime:oklch(0.86 0.17 128); --lime-d:oklch(0.86 0.17 128 / 0.14); --lime-b:oklch(0.92 0.19 128);
+  --amber:oklch(0.82 0.16 72); --amber-d:oklch(0.82 0.16 72 / 0.14);
+  --aqua:oklch(0.78 0.12 225); --aqua-d:oklch(0.78 0.12 225 / 0.14);
+  --rose:oklch(0.72 0.17 20); --rose-d:oklch(0.72 0.17 20 / 0.14);
+  --violet:oklch(0.74 0.13 290); --violet-d:oklch(0.74 0.13 290 / 0.14);
+  --sans:'Inter',system-ui,sans-serif; --serif:'Instrument Serif',Georgia,serif; --mono:'JetBrains Mono',monospace;
+  --pad:20px; --radius:18px;
+}
+[data-density="compact"]{--pad:14px;--radius:12px;}
+*{box-sizing:border-box;-webkit-font-smoothing:antialiased;}
+body{margin:0;background:#050706;color:var(--t-1);font-family:var(--sans);letter-spacing:-0.01em;}
+.hero-num{font-family:var(--serif);font-weight:400;letter-spacing:-0.02em;line-height:1;display:inline-block;font-feature-settings:"lnum","tnum";}
+.label{font-size:10.5px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--t-3);}
+.coach{font-family:var(--serif);letter-spacing:-0.01em;line-height:1.2;}
+.card{background:var(--bg-2);border:0.5px solid var(--line);border-radius:var(--radius);padding:var(--pad);}
+.card-ghost{background:var(--bg-1);border:0.5px solid var(--line);border-radius:var(--radius);padding:var(--pad);}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:inherit;transition:all .12s;letter-spacing:-0.01em;}
+.btn:active{transform:scale(0.97);}
+.btn-lime{background:var(--lime);color:#0A0D0C;}
+.btn-lime:hover{background:var(--lime-b);}
+.btn-ghost{background:var(--bg-3);color:var(--t-1);}
+.btn-ghost:hover{background:var(--bg-4);}
+.btn-outline{background:transparent;color:var(--t-2);border:0.5px solid var(--line-s);}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:500;background:var(--bg-3);color:var(--t-2);}
+.chip.lime{background:var(--lime-d);color:var(--lime-b);}
+.chip.amber{background:var(--amber-d);color:var(--amber);}
+.chip.aqua{background:var(--aqua-d);color:var(--aqua);}
+.chip.rose{background:var(--rose-d);color:var(--rose);}
+.bar{height:6px;border-radius:999px;background:var(--bg-3);overflow:hidden;}
+.bar>span{display:block;height:100%;border-radius:999px;background:var(--lime);transition:width .6s ease;}
+button:focus{outline:none;}
+input{font-family:inherit;}
+.hide-scroll::-webkit-scrollbar{display:none;}
+.hide-scroll{scrollbar-width:none;}
+@keyframes breathe{0%,100%{opacity:0.9;}50%{opacity:1;transform:scale(1.05);}}
+@keyframes pulse{0%{transform:scale(1);opacity:0.6;}100%{transform:scale(2);opacity:0;}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+.fade-in{animation:fadeIn .3s ease both;}
+
+/* App shell */
+.shell{display:grid;grid-template-columns:240px 1fr;min-height:100vh;
+  background:radial-gradient(ellipse 900px 600px at 15% 10%,rgba(180,230,120,0.06),transparent 60%),
+    radial-gradient(ellipse 700px 500px at 85% 95%,rgba(120,180,220,0.04),transparent 60%),
+    #050706;}
+.sidebar{background:var(--bg-1);border-right:0.5px solid var(--line);padding:22px 14px;display:flex;flex-direction:column;gap:4px;}
+.brand{display:flex;align-items:center;gap:10px;padding:0 6px;margin-bottom:24px;}
+.brand-logo{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--lime),var(--lime-b));display:flex;align-items:center;justify-content:center;}
+.brand-name{font-size:15px;font-weight:600;letter-spacing:-0.02em;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;color:var(--t-2);font-size:13px;font-weight:500;background:transparent;border:none;cursor:pointer;font-family:inherit;text-align:left;}
+.nav-item:hover{background:var(--bg-2);color:var(--t-1);}
+.nav-item.active{background:var(--bg-3);color:var(--t-1);}
+.nav-item.active .nav-icon{color:var(--lime);}
+.nav-icon{color:var(--t-3);flex-shrink:0;}
+.nav-section{font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--t-4);padding:16px 12px 6px;font-weight:500;}
+.main{padding:28px 36px 80px;max-width:1440px;width:100%;overflow-x:hidden;}
+.topbar{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;gap:20px;flex-wrap:wrap;}
+
+/* Responsive */
+@media (max-width:900px){
+  .shell{grid-template-columns:1fr;}
+  .sidebar{position:sticky;top:0;z-index:10;flex-direction:row;overflow-x:auto;padding:12px;gap:6px;}
+  .sidebar .brand, .sidebar .nav-section, .sidebar .bottom-info{display:none;}
+  .nav-item{flex-shrink:0;padding:8px 12px;font-size:12px;}
+  .nav-item span.nav-label{display:inline;}
+  .main{padding:20px 16px 80px;}
+}
+
+/* PDF drop zone */
+.drop{border:1.5px dashed var(--line-s);border-radius:var(--radius);padding:24px;text-align:center;cursor:pointer;transition:all .15s;}
+.drop:hover{border-color:var(--lime);background:var(--lime-d);}
+.drop.active{border-color:var(--lime);background:var(--lime-d);}
+
+/* Meal option tile */
+.opt{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;background:var(--bg-3);border:0.5px solid var(--line);cursor:pointer;transition:all .15s;}
+.opt:hover{background:var(--bg-4);border-color:var(--line-s);}
+.opt.picked{background:var(--lime-d);border-color:var(--lime);}
+.opt-check{width:22px;height:22px;border-radius:7px;border:1.5px solid var(--t-3);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;}
+.opt.picked .opt-check{background:var(--lime);border-color:var(--lime);}
+.opt-name{font-size:13.5px;font-weight:500;color:var(--t-1);}
+.opt-qty{font-size:11.5px;color:var(--t-3);margin-top:2px;}
+.opt-kcal{font-size:15px;color:var(--t-2);font-family:var(--serif);}
+
+/* Dialog */
+.dialog-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(10px);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;}
+.dialog{background:var(--bg-1);border:0.5px solid var(--line-s);border-radius:20px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;animation:fadeIn .25s ease;}
+</style>
+</head>
+<body>
+
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" data-presets="env,react">
+// ═══════════════════════════════════════════════════════════════
+// ICONS
+// ═══════════════════════════════════════════════════════════════
+const Icon = ({name,size=18,color='currentColor',sw=1.75}) => {
+  const s={width:size,height:size,stroke:color,strokeWidth:sw,fill:'none',strokeLinecap:'round',strokeLinejoin:'round'};
+  const p={
+    calendar:<><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></>,
+    plate:<><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4"/></>,
+    shoe:<><path d="M3 17v-4a3 3 0 013-3h1l2-4 4 2 4 6h3a2 2 0 012 2v1H3z"/><path d="M8 17v2M14 17v2M19 17v2"/></>,
+    chart:<><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></>,
+    drop:<><path d="M12 2.5c-3 4-6 7.5-6 11.5a6 6 0 0012 0c0-4-3-7.5-6-11.5z"/></>,
+    upload:<><path d="M12 16V4M7 9l5-5 5 5M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/></>,
+    file:<><path d="M14 3H6a1 1 0 00-1 1v16a1 1 0 001 1h12a1 1 0 001-1V8l-5-5zM14 3v5h5"/></>,
+    check:<><path d="M4 12l5 5L20 6"/></>,
+    x:<><path d="M6 6l12 12M6 18L18 6"/></>,
+    plus:<><path d="M12 5v14M5 12h14"/></>,
+    minus:<><path d="M5 12h14"/></>,
+    play:<><path d="M7 4v16l13-8z" fill={color}/></>,
+    pause:<><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></>,
+    flame:<><path d="M12 2.5c1.5 2.5 4.5 4 4.5 7.5 0 1.5-.5 2.5-1 3.5 2 .5 3.5 2.5 3.5 5 0 3.5-3 6-7 6s-7-2.5-7-6c0-2.5 1.5-4 3-5-.5-1-.5-2 0-3 1 1 2 1 2.5.5-.5-1.5 0-3 1-4 0 1 1 2 2 2-.5-2 .5-4.5-1.5-6.5z"/></>,
+    bell:<><path d="M6 8a6 6 0 0112 0c0 4 1.5 5 2.5 6.5H3.5C4.5 13 6 12 6 8zM10 19a2 2 0 004 0"/></>,
+    alert:<><path d="M12 3l10 17H2L12 3zM12 10v5M12 18v.01"/></>,
+    trend:<><path d="M3 17l6-6 4 4 8-9M14 6h7v7"/></>,
+    chevronR:<><path d="M9 6l6 6-6 6"/></>,
+    chevronL:<><path d="M15 6l-6 6 6 6"/></>,
+    chevronD:<><path d="M6 9l6 6 6-6"/></>,
+    timer:<><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/></>,
+    search:<><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></>,
+    sparkle:<><path d="M12 3v6M12 15v6M3 12h6M15 12h6M6 6l4 4M14 14l4 4M18 6l-4 4M10 14l-4 4" strokeWidth="1.3"/></>,
+    user:<><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.5 3.5-8 8-8s8 3.5 8 8"/></>,
+    gear:<><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2 2M17.8 17.8l2 2M2 12h3M19 12h3M4.2 19.8l2-2M17.8 6.2l2-2"/></>,
+    dumbbell:<><path d="M3 9v6M7 6v12M17 6v12M21 9v6M7 12h10"/></>,
+    download:<><path d="M12 4v12M7 11l5 5 5-5M4 20h16"/></>,
+    refresh:<><path d="M21 12a9 9 0 11-3-6.7L21 8M21 3v5h-5"/></>,
+  };
+  return <svg viewBox="0 0 24 24" style={s}>{p[name]}</svg>;
+};
+
+// ═══════════════════════════════════════════════════════════════
+// NUTRITION DATABASE — per-item macro reference (per unit)
+// Calculated from USDA + Indian food composition tables
+// ═══════════════════════════════════════════════════════════════
+const NUTRITION = {
+  // [kcal, protein(g), carbs(g), fat(g), fiber(g)]
+  'Lemon water (1 glass)':           [10, 0.2, 2.5, 0, 0.2],
+  'Cinnamon powder (pinch)':         [3, 0.1, 1, 0, 0.5],
+  'Almonds (6)':                     [42, 1.5, 1.5, 3.6, 0.9],
+  'Walnuts (2)':                     [52, 1.2, 1.1, 5.2, 0.5],
+  'Coffee (black, 1 cup)':           [5, 0.3, 0, 0, 0],
+  'Double-toned milk (150ml)':       [72, 5, 7.5, 2.3, 0],
+  'Daliya veg upma (1.5 cup)':       [285, 9.5, 52, 5.5, 6.2],
+  'Millet veg upma (1.5 cup)':       [295, 9, 54, 5.5, 7],
+  'Phulka (3 × 25g)':                [195, 6, 39, 1.5, 4.5],
+  'Millet roti (3 × 25g)':           [210, 6.5, 41, 2, 6],
+  'Veg curry (½ cup)':               [85, 2.5, 10, 4, 3],
+  'Pesarattu (3)':                   [320, 18, 48, 6, 9],
+  'Chilla (3)':                      [290, 14, 40, 8, 5],
+  'Veg chutney (2 tbsp)':            [35, 1, 4, 1.5, 1.2],
+  'Boiled egg whites (2)':           [34, 7, 0.5, 0, 0],
+  'Chia seeds (2 tsp)':              [50, 1.7, 4.2, 3.2, 3.5],
+  'Fruit, 125-150g':                 [75, 1, 18, 0.3, 3],
+  'Veg salad (1 cup)':               [35, 2, 7, 0.3, 3],
+  'Red rice (2 cups, 50g raw)':      [365, 7.5, 78, 2.5, 4.5],
+  'Veg curry (1 cup)':               [170, 5, 20, 8, 6],
+  'Rasam (½ cup)':                   [45, 2, 7, 1, 1.5],
+  'Dhal (½ cup)':                    [110, 7, 18, 1.5, 4],
+  'Soya chunks (½ cup)':             [90, 14, 3, 0.5, 3.5],
+  'Egg white (1)':                   [17, 3.5, 0.2, 0, 0],
+  'Boiled grams (1 cup)':            [165, 10, 28, 2.5, 8],
+  'Sprouts (1 cup)':                 [130, 11, 22, 1, 7],
+  'Fruits (75g)':                    [40, 0.5, 9, 0.2, 1.5],
+  'Lime water':                      [8, 0.1, 2, 0, 0.1],
+  'Jowari roti (3, ~33g each)':      [255, 7.5, 49, 3, 7.5],
+  'Phulka (3 × 33g)':                [255, 8, 51, 2, 6],
+  'Soya curry (½ cup)':              [120, 14, 8, 3, 4],
+  'Pista, unsalted (10)':            [42, 1.5, 2, 3.5, 0.8],
+};
+
+// ═══════════════════════════════════════════════════════════════
+// PLAN — parsed from Surya's PDF
+// ═══════════════════════════════════════════════════════════════
+const PLAN_META = {
+  name: 'Surya Teja Malladi',
+  age: '38Y',
+  umr: 'UMR941739',
+  condition: 'High BMI',
+  prescribed: 'Complex Carb, Moderate Protein + Antioxidants',
+  counselor: 'Dr. Latha · Fernandez Hospital',
+  reviewDate: '04 May 2026',
+  waterTarget: 3250, // mid of 3–3.5L
+  oilTsp: '3–4 tsp',
+  walking: '15 min × 4 (post meals)',
+  notes: '1 cup = 200 ml · 1 tsp = 5 ml · 1 TBS = 15 ml',
+};
+
+// Each slot has multiple option groups; user picks what they actually ate
+const MEAL_SLOTS = [
+  { id:'em', time:'7:30–8:00', name:'Early morning', required:[
+    { id:'em-a', label:'Always', items:[
+      'Lemon water (1 glass)','Cinnamon powder (pinch)','Almonds (6)','Walnuts (2)',
+    ]},
+    { id:'em-b', label:'Then pick one', pickOne:true, options:[
+      { id:'coffee', label:'Coffee', items:['Coffee (black, 1 cup)'] },
+      { id:'milk',   label:'Milk (no sugar)', items:['Double-toned milk (150ml)'] },
+    ]},
+  ]},
+  { id:'bk', time:'9:30', name:'Breakfast', pickOne:true, options:[
+    { id:'daliya',   label:'Daliya / Millet upma + Veg curry', items:['Daliya veg upma (1.5 cup)','Veg curry (½ cup)'] },
+    { id:'phulka',   label:'Phulka + Veg curry',              items:['Phulka (3 × 25g)','Veg curry (½ cup)'] },
+    { id:'millrot',  label:'Millet roti + Veg curry',         items:['Millet roti (3 × 25g)','Veg curry (½ cup)'] },
+    { id:'pesara',   label:'Pesarattu + Chutney + Egg whites',items:['Pesarattu (3)','Veg chutney (2 tbsp)','Boiled egg whites (2)'] },
+    { id:'chilla',   label:'Chilla + Chutney + Egg whites',   items:['Chilla (3)','Veg chutney (2 tbsp)','Boiled egg whites (2)'] },
+  ]},
+  { id:'mm', time:'11:30', name:'Mid-morning', required:[
+    { id:'mm-a', label:'Always', items:['Chia seeds (2 tsp)','Fruit, 125-150g'] },
+  ]},
+  { id:'ln', time:'13:30', name:'Lunch', sections:[
+    { id:'ln-base', label:'Base', items:['Veg salad (1 cup)','Red rice (2 cups, 50g raw)','Veg curry (1 cup)'] },
+    { id:'ln-side', label:'Pick one side', pickOne:true, options:[
+      { id:'rasam', label:'Rasam', items:['Rasam (½ cup)'] },
+      { id:'dhal',  label:'Dhal',  items:['Dhal (½ cup)'] },
+      { id:'soya',  label:'Soya chunks', items:['Soya chunks (½ cup)'] },
+      { id:'egg',   label:'1–2 egg whites', items:['Egg white (1)','Egg white (1)'] },
+    ]},
+  ]},
+  { id:'sn', time:'16:30', name:'Snack', pickOne:true, options:[
+    { id:'grams',   label:'Boiled grams + Veg + Lime water', items:['Boiled grams (1 cup)','Fruits (75g)','Lime water'] },
+    { id:'sprouts', label:'Sprouts + Veg + Lime water',      items:['Sprouts (1 cup)','Fruits (75g)','Lime water'] },
+  ]},
+  { id:'dn', time:'19:30', name:'Dinner', sections:[
+    { id:'dn-base', label:'Base', items:['Veg salad (1 cup)','Veg curry (1 cup)'] },
+    { id:'dn-roti', label:'Pick one', pickOne:true, options:[
+      { id:'jowari', label:'Jowari roti × 3', items:['Jowari roti (3, ~33g each)'] },
+      { id:'phulka-d', label:'Phulka × 3',    items:['Phulka (3 × 33g)'] },
+    ]},
+    { id:'dn-prot', label:'Protein', pickOne:true, options:[
+      { id:'soya-d', label:'Soya curry', items:['Soya curry (½ cup)'] },
+      { id:'egg-d',  label:'1–2 egg whites', items:['Egg white (1)','Egg white (1)'] },
+    ]},
+  ]},
+  { id:'nt', time:'22:00', name:'Night', required:[
+    { id:'nt-a', label:'Always', items:['Double-toned milk (150ml)','Pista, unsalted (10)'] },
+  ]},
+];
+
+// ═══════════════════════════════════════════════════════════════
+// STATE — localStorage persistence
+// ═══════════════════════════════════════════════════════════════
+const LSKEY = 'coach_v2';
+const loadState = () => { try { return JSON.parse(localStorage.getItem(LSKEY)) || {}; } catch { return {}; } };
+const saveState = (s) => localStorage.setItem(LSKEY, JSON.stringify(s));
+
+function useAppState() {
+  const init = loadState();
+  const today = new Date().toISOString().slice(0,10);
+  const [activeTab, setActiveTab] = React.useState(init.activeTab || 'meal');
+  // log shape: { 'YYYY-MM-DD': { slotId: { items: [itemName, ...], time: 'HH:MM' } } }
+  const [log, setLog] = React.useState(init.log || {});
+  const [water, setWater] = React.useState(init.water || {}); // { date: ml }
+  const [steps, setSteps] = React.useState(init.steps || { [today]: 4820 });
+  const [workouts, setWorkouts] = React.useState(init.workouts || {}); // { date: [{name,dur,kcal,time}] }
+  const [weight, setWeight] = React.useState(init.weight || { [today]: 88.2 });
+  const [density, setDensity] = React.useState(init.density || 'spacious');
+
+  React.useEffect(() => {
+    saveState({ activeTab, log, water, steps, workouts, weight, density });
+    document.documentElement.setAttribute('data-density', density);
+  }, [activeTab, log, water, steps, workouts, weight, density]);
+
+  return { activeTab, setActiveTab, log, setLog, water, setWater, steps, setSteps,
+           workouts, setWorkouts, weight, setWeight, density, setDensity, today };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// NUTRITION HELPERS
+// ═══════════════════════════════════════════════════════════════
+const sumNutrition = (items) => {
+  let kcal=0, p=0, c=0, f=0, fi=0;
+  for (const it of items) {
+    const n = NUTRITION[it];
+    if (n) { kcal+=n[0]; p+=n[1]; c+=n[2]; f+=n[3]; fi+=n[4]; }
+  }
+  return { kcal:Math.round(kcal), p:+p.toFixed(1), c:+c.toFixed(1), f:+f.toFixed(1), fi:+fi.toFixed(1) };
+};
+
+const slotPlannedItems = (slot, picks = {}) => {
+  // Given user picks per option group, return items and counts
+  let items = [];
+  if (slot.pickOne) {
+    const pid = picks[slot.id];
+    const opt = slot.options.find(o => o.id === pid) || slot.options[0];
+    items = opt.items;
+  } else if (slot.required) {
+    slot.required.forEach(r => {
+      if (r.pickOne) {
+        const opt = r.options.find(o => o.id === picks[r.id]) || r.options[0];
+        items.push(...opt.items);
+      } else {
+        items.push(...r.items);
+      }
+    });
+  } else if (slot.sections) {
+    slot.sections.forEach(s => {
+      if (s.pickOne) {
+        const opt = s.options.find(o => o.id === picks[s.id]) || s.options[0];
+        items.push(...opt.items);
+      } else {
+        items.push(...s.items);
+      }
+    });
+  }
+  return items;
+};
+
+const dayTotals = (logForDay) => {
+  let all = [];
+  Object.values(logForDay || {}).forEach(m => { if (m.items) all.push(...m.items); });
+  return sumNutrition(all);
+};
+
+// Plan baseline (average across most common picks) — used for target
+const planTargets = () => {
+  // Typical day using most common picks
+  const typical = [
+    'Lemon water (1 glass)','Cinnamon powder (pinch)','Almonds (6)','Walnuts (2)','Double-toned milk (150ml)',
+    'Daliya veg upma (1.5 cup)','Veg curry (½ cup)',
+    'Chia seeds (2 tsp)','Fruit, 125-150g',
+    'Veg salad (1 cup)','Red rice (2 cups, 50g raw)','Veg curry (1 cup)','Dhal (½ cup)',
+    'Boiled grams (1 cup)','Fruits (75g)','Lime water',
+    'Veg salad (1 cup)','Veg curry (1 cup)','Jowari roti (3, ~33g each)','Soya curry (½ cup)',
+    'Double-toned milk (150ml)','Pista, unsalted (10)',
+  ];
+  return sumNutrition(typical);
+};
+const TARGETS = planTargets();
+
+// ═══════════════════════════════════════════════════════════════
+// SHARED UI
+// ═══════════════════════════════════════════════════════════════
+function Ring({size=80,stroke=7,value=0,color='var(--lime)',track='var(--bg-3)',children}) {
+  const r=(size-stroke)/2, C=2*Math.PI*r, o=C*(1-Math.max(0,Math.min(1,value)));
+  return (<div style={{width:size,height:size,position:'relative'}}>
+    <svg width={size} height={size} style={{transform:'rotate(-90deg)'}}>
+      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={track} strokeWidth={stroke}/>
+      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth={stroke}
+        strokeDasharray={C} strokeDashoffset={o} strokeLinecap="round"
+        style={{transition:'stroke-dashoffset .6s ease'}}/>
+    </svg>
+    {children && <div style={{position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center'}}>{children}</div>}
+  </div>);
+}
+
+function StatTile({label,value,unit,sub,color='var(--t-1)',big=32}) {
+  return (<div className="card" style={{padding:16}}>
+    <div className="label" style={{marginBottom:8}}>{label}</div>
+    <div style={{display:'flex',alignItems:'flex-end',gap:6}}>
+      <span className="hero-num" style={{fontSize:big,color}}>{value}</span>
+      {unit && <span style={{fontSize:12,color:'var(--t-3)',paddingBottom:3}}>{unit}</span>}
+    </div>
+    {sub && <div style={{fontSize:11.5,color:'var(--t-3)',marginTop:6}}>{sub}</div>}
+  </div>);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TAB 1: MEAL PLAN
+// ═══════════════════════════════════════════════════════════════
+function MealPlanTab({ state, onSwitch }) {
+  const [showUpload, setShowUpload] = React.useState(false);
+  const [picks, setPicks] = React.useState(() => {
+    const saved = loadState().picks || {};
+    return saved;
+  });
+
+  React.useEffect(() => {
+    const s = loadState();
+    saveState({ ...s, picks });
+  }, [picks]);
+
+  return (<div className="fade-in">
+    <div className="topbar">
+      <div>
+        <div className="label">Active plan · updated weekly</div>
+        <h1 style={{fontSize:32,fontWeight:600,letterSpacing:'-0.02em',margin:'6px 0 0'}}>{PLAN_META.prescribed}</h1>
+        <div style={{fontSize:13,color:'var(--t-2)',marginTop:6}}>
+          {PLAN_META.name} · {PLAN_META.condition} · {PLAN_META.counselor}
+        </div>
+      </div>
+      <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
+        <button className="btn btn-outline" onClick={() => setShowUpload(true)}>
+          <Icon name="upload" size={14}/> Upload next week
+        </button>
+        <button className="btn btn-lime" onClick={() => onSwitch('food')}>
+          <Icon name="plate" size={14}/> Start logging
+        </button>
+      </div>
+    </div>
+
+    {/* Plan metadata */}
+    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(180px,1fr))',gap:12,marginBottom:24}}>
+      <StatTile label="Calories · target" value={TARGETS.kcal} unit="kcal/day" color="var(--lime)" big={30}/>
+      <StatTile label="Protein" value={TARGETS.p} unit="g" color="var(--aqua)" big={30}/>
+      <StatTile label="Water" value="3.25" unit="L/day" color="var(--violet)" big={30}/>
+      <StatTile label="Walking" value="4" unit="× 15 min" color="var(--amber)" big={30} sub="post-meal"/>
+    </div>
+
+    <div className="coach" style={{fontSize:24,color:'var(--t-2)',marginBottom:20,maxWidth:620}}>
+      "Pick your options on each meal. We'll compute nutrition exactly on what you choose. Don't improvise."
+    </div>
+
+    {/* Meal slots */}
+    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(360px,1fr))',gap:14}}>
+      {MEAL_SLOTS.map(slot => (
+        <MealSlotCard key={slot.id} slot={slot} picks={picks} setPicks={setPicks}/>
+      ))}
+    </div>
+
+    <div style={{marginTop:30,padding:'18px 20px',background:'var(--bg-1)',borderRadius:14,border:'0.5px solid var(--line)',fontSize:12,color:'var(--t-3)',lineHeight:1.6}}>
+      <strong style={{color:'var(--t-2)'}}>Plan notes</strong> · {PLAN_META.notes} · Oil {PLAN_META.oilTsp} · Review: {PLAN_META.reviewDate} · Last parsed from PDF uploaded by clinic.
+    </div>
+
+    {showUpload && <UploadDialog onClose={() => setShowUpload(false)}/>}
+  </div>);
+}
+
+function MealSlotCard({ slot, picks, setPicks }) {
+  const items = slotPlannedItems(slot, picks);
+  const n = sumNutrition(items);
+
+  return (<div className="card">
+    <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:14}}>
+      <div>
+        <div style={{fontSize:11,color:'var(--lime)',letterSpacing:'0.1em',textTransform:'uppercase',fontWeight:600}}>{slot.time}</div>
+        <div style={{fontSize:17,fontWeight:600,marginTop:2}}>{slot.name}</div>
+      </div>
+      <div style={{textAlign:'right'}}>
+        <div className="hero-num" style={{fontSize:22,color:'var(--t-1)'}}>{n.kcal}</div>
+        <div style={{fontSize:10,color:'var(--t-3)',letterSpacing:'0.06em'}}>KCAL</div>
+      </div>
+    </div>
+
+    {slot.pickOne && <OptionGroup options={slot.options} value={picks[slot.id]} onChange={v => setPicks({...picks,[slot.id]:v})}/>}
+    {slot.required && slot.required.map(r =>
+      r.pickOne
+        ? <div key={r.id} style={{marginBottom:10}}>
+            <div className="label" style={{marginBottom:8,fontSize:10}}>{r.label}</div>
+            <OptionGroup options={r.options} value={picks[r.id]} onChange={v => setPicks({...picks,[r.id]:v})}/>
+          </div>
+        : <ItemsList key={r.id} items={r.items} label={r.label}/>
+    )}
+    {slot.sections && slot.sections.map(s =>
+      s.pickOne
+        ? <div key={s.id} style={{marginBottom:10}}>
+            <div className="label" style={{marginBottom:8,fontSize:10}}>{s.label}</div>
+            <OptionGroup options={s.options} value={picks[s.id]} onChange={v => setPicks({...picks,[s.id]:v})}/>
+          </div>
+        : <ItemsList key={s.id} items={s.items} label={s.label}/>
+    )}
+
+    {/* macro strip */}
+    <div style={{marginTop:14,paddingTop:14,borderTop:'0.5px solid var(--line)',display:'flex',gap:14,fontSize:11}}>
+      <span style={{color:'var(--aqua)'}}>{n.p}g P</span>
+      <span style={{color:'var(--lime)'}}>{n.c}g C</span>
+      <span style={{color:'var(--amber)'}}>{n.f}g F</span>
+      <span style={{color:'var(--t-3)'}}>{n.fi}g fiber</span>
+    </div>
+  </div>);
+}
+
+function OptionGroup({ options, value, onChange }) {
+  const active = value || options[0].id;
+  return (<div style={{display:'flex',flexDirection:'column',gap:6}}>
+    {options.map(o => {
+      const on = o.id === active;
+      return (<button key={o.id} onClick={() => onChange(o.id)} style={{
+        textAlign:'left',padding:'10px 12px',borderRadius:10,
+        background: on ? 'var(--lime-d)' : 'var(--bg-3)',
+        border:`0.5px solid ${on?'var(--lime)':'var(--line)'}`,
+        color:'var(--t-1)',cursor:'pointer',fontFamily:'inherit',
+      }}>
+        <div style={{display:'flex',alignItems:'center',gap:10}}>
+          <div style={{width:14,height:14,borderRadius:999,border:`1.5px solid ${on?'var(--lime)':'var(--t-3)'}`,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+            {on && <div style={{width:6,height:6,borderRadius:999,background:'var(--lime)'}}/>}
+          </div>
+          <div style={{flex:1}}>
+            <div style={{fontSize:13,fontWeight:500}}>{o.label}</div>
+            <div style={{fontSize:10.5,color:'var(--t-3)',marginTop:2}}>{o.items.join(' · ')}</div>
+          </div>
+        </div>
+      </button>);
+    })}
+  </div>);
+}
+
+function ItemsList({ items, label }) {
+  return (<div style={{marginBottom:10}}>
+    <div className="label" style={{marginBottom:8,fontSize:10}}>{label}</div>
+    <div style={{display:'flex',flexWrap:'wrap',gap:6}}>
+      {items.map((it,i) => <span key={i} className="chip">{it}</span>)}
+    </div>
+  </div>);
+}
+
+function UploadDialog({ onClose }) {
+  const [stage, setStage] = React.useState('pick');
+  return (<div className="dialog-backdrop" onClick={onClose}>
+    <div className="dialog" onClick={e => e.stopPropagation()} style={{padding:24}}>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:18}}>
+        <div>
+          <div className="label">Upload next week's plan</div>
+          <div style={{fontSize:19,fontWeight:600,marginTop:4}}>New diet chart</div>
+        </div>
+        <button onClick={onClose} style={{background:'transparent',border:'none',cursor:'pointer',color:'var(--t-3)',padding:4}}>
+          <Icon name="x" size={18}/>
+        </button>
+      </div>
+
+      {stage === 'pick' && <>
+        <div className="drop" onClick={() => setStage('parsing')}>
+          <Icon name="upload" size={32} color="var(--t-3)"/>
+          <div style={{fontSize:14,fontWeight:500,marginTop:10}}>Drop PDF or click to browse</div>
+          <div style={{fontSize:11.5,color:'var(--t-3)',marginTop:4}}>From Dr. Latha · Fernandez Nutrition</div>
+        </div>
+        <div style={{marginTop:12,display:'flex',gap:8}}>
+          <button className="btn btn-ghost" style={{flex:1,fontSize:12}} onClick={() => setStage('parsing')}>
+            <Icon name="file" size={14}/> Take photo
+          </button>
+          <button className="btn btn-ghost" style={{flex:1,fontSize:12}} onClick={() => setStage('parsing')}>
+            <Icon name="search" size={14}/> Manual entry
+          </button>
+        </div>
+      </>}
+
+      {stage === 'parsing' && <ParsingView onDone={() => setStage('review')}/>}
+      {stage === 'review' && <ReviewView onDone={onClose}/>}
+    </div>
+  </div>);
+}
+
+function ParsingView({ onDone }) {
+  const [step, setStep] = React.useState(0);
+  const steps = [
+    'Reading PDF structure…',
+    'Identified 7 meal slots',
+    'Extracted 22 unique foods',
+    'Matched to nutrition database',
+    'Ready for review',
+  ];
+  React.useEffect(() => {
+    if (step < steps.length-1) {
+      const t = setTimeout(() => setStep(step+1), 700);
+      return () => clearTimeout(t);
+    } else {
+      const t = setTimeout(onDone, 500);
+      return () => clearTimeout(t);
+    }
+  }, [step]);
+  return (<div style={{padding:'14px 0'}}>
+    <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:18,color:'var(--lime)',fontSize:12,letterSpacing:'0.1em',textTransform:'uppercase',fontWeight:600}}>
+      <div style={{width:8,height:8,borderRadius:999,background:'var(--lime)',animation:'breathe 1.5s infinite'}}/>
+      AI parsing
+    </div>
+    {steps.map((s,i) => (<div key={i} style={{display:'flex',alignItems:'center',gap:10,padding:'8px 0',fontSize:13,color:i<=step?'var(--t-1)':'var(--t-4)'}}>
+      <div style={{width:16,height:16,borderRadius:999,background:i<step?'var(--lime)':'var(--bg-3)',display:'flex',alignItems:'center',justifyContent:'center'}}>
+        {i<step && <Icon name="check" size={10} color="#0A0D0C" sw={3}/>}
+        {i===step && <div style={{width:5,height:5,borderRadius:999,background:'var(--lime)',animation:'breathe 1s infinite'}}/>}
+      </div>
+      {s}
+    </div>))}
+  </div>);
+}
+
+function ReviewView({ onDone }) {
+  return (<div style={{padding:'8px 0'}}>
+    <div style={{fontSize:13,color:'var(--t-2)',marginBottom:14,lineHeight:1.55}}>
+      Parsed plan matches your current week. New targets: <strong style={{color:'var(--lime)'}}>{TARGETS.kcal} kcal</strong>, {TARGETS.p}g protein.
+    </div>
+    <div style={{display:'flex',gap:8}}>
+      <button className="btn btn-ghost" style={{flex:1}} onClick={onDone}>Cancel</button>
+      <button className="btn btn-lime" style={{flex:2}} onClick={onDone}>Apply for next week</button>
+    </div>
+  </div>);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TAB 2: FOOD & WATER
+// ═══════════════════════════════════════════════════════════════
+function FoodWaterTab({ state }) {
+  const { log, setLog, water, setWater, today } = state;
+  const [picks, setPicks] = React.useState(() => loadState().picks || {});
+  const dayLog = log[today] || {};
+  const dayWater = water[today] || 0;
+  const totals = dayTotals(dayLog);
+
+  const logMeal = (slotId, items) => {
+    const time = new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false});
+    setLog({ ...log, [today]: { ...dayLog, [slotId]: { items, time } } });
+  };
+  const addWater = (ml) => setWater({ ...water, [today]: Math.max(0, dayWater + ml) });
+
+  const hour = new Date().getHours();
+  const activeSlot = MEAL_SLOTS.find(s => {
+    const [h] = s.time.split(/[–-]/)[0].split(':').map(Number);
+    return hour <= h + 1;
+  }) || MEAL_SLOTS[MEAL_SLOTS.length-1];
+
+  return (<div className="fade-in">
+    <div className="topbar">
+      <div>
+        <div className="label">Today · {new Date().toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'})}</div>
+        <h1 style={{fontSize:32,fontWeight:600,letterSpacing:'-0.02em',margin:'6px 0 0'}}>Food & Water</h1>
+        <div style={{fontSize:13,color:'var(--t-2)',marginTop:6}}>Log what you actually ate from today's plan. Numbers update live.</div>
+      </div>
+    </div>
+
+    {/* Nutrition hero */}
+    <div style={{display:'grid',gridTemplateColumns:'1.4fr 1fr',gap:14,marginBottom:20}} className="main-grid">
+      <div className="card" style={{padding:22}}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:18}}>
+          <div>
+            <div className="label">Consumed today</div>
+            <div style={{display:'flex',alignItems:'flex-end',gap:6,marginTop:8}}>
+              <span className="hero-num" style={{fontSize:56,color:'var(--lime)'}}>{totals.kcal}</span>
+              <span style={{fontSize:14,color:'var(--t-3)',paddingBottom:6}}>/ {TARGETS.kcal} kcal</span>
+            </div>
+            <div style={{marginTop:12,maxWidth:260}}>
+              <div className="bar"><span style={{width:`${Math.min(100,totals.kcal/TARGETS.kcal*100)}%`}}/></div>
+            </div>
+          </div>
+          <Ring size={100} stroke={9} value={totals.kcal/TARGETS.kcal}>
+            <span className="hero-num" style={{fontSize:22}}>{Math.round(totals.kcal/TARGETS.kcal*100)}%</span>
+          </Ring>
+        </div>
+        {/* Macros */}
+        <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:14,paddingTop:18,borderTop:'0.5px solid var(--line)'}}>
+          <MacroBar label="Protein" v={totals.p} t={TARGETS.p} color="var(--aqua)" unit="g"/>
+          <MacroBar label="Carbs"   v={totals.c} t={TARGETS.c} color="var(--lime)" unit="g"/>
+          <MacroBar label="Fat"     v={totals.f} t={TARGETS.f} color="var(--amber)" unit="g"/>
+          <MacroBar label="Fiber"   v={totals.fi} t={35}        color="var(--violet)" unit="g"/>
+        </div>
+      </div>
+
+      {/* Water */}
+      <WaterCard ml={dayWater} target={PLAN_META.waterTarget} onAdd={addWater}/>
+    </div>
+
+    {/* Today's meal log */}
+    <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14}}>
+      <div>
+        <div className="label" style={{marginBottom:12}}>Log a meal · {activeSlot.name} is up</div>
+        <div style={{display:'flex',flexDirection:'column',gap:10}}>
+          {MEAL_SLOTS.map(slot => {
+            const logged = dayLog[slot.id];
+            return (<MealLogger key={slot.id} slot={slot} picks={picks} setPicks={setPicks} logged={logged}
+              onLog={(items) => logMeal(slot.id, items)}
+              active={slot.id === activeSlot.id && !logged}/>);
+          })}
+        </div>
+      </div>
+
+      <div>
+        <div className="label" style={{marginBottom:12}}>Today's timeline</div>
+        <div className="card" style={{padding:0,overflow:'hidden'}}>
+          {MEAL_SLOTS.map((slot,i) => {
+            const logged = dayLog[slot.id];
+            const n = logged ? sumNutrition(logged.items) : null;
+            return (<div key={slot.id} style={{padding:'14px 16px',display:'flex',alignItems:'flex-start',gap:12,borderBottom:i<MEAL_SLOTS.length-1?'0.5px solid var(--line)':'none',opacity:logged?1:0.55}}>
+              <div style={{width:46,fontSize:11,color:'var(--t-3)',fontVariantNumeric:'tabular-nums',paddingTop:1}}>{slot.time.split(/[–-]/)[0]}</div>
+              <div style={{width:20,height:20,borderRadius:6,background:logged?'var(--lime)':'var(--bg-3)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,marginTop:1}}>
+                {logged && <Icon name="check" size={11} color="#0A0D0C" sw={3}/>}
+              </div>
+              <div style={{flex:1}}>
+                <div style={{fontSize:13,fontWeight:600}}>{slot.name}</div>
+                <div style={{fontSize:11,color:'var(--t-3)',marginTop:2}}>
+                  {logged ? `Logged ${logged.time} · ${logged.items.length} items` : 'Not yet logged'}
+                </div>
+              </div>
+              {logged && <div style={{textAlign:'right',flexShrink:0}}>
+                <div className="hero-num" style={{fontSize:17,color:'var(--lime)'}}>{n.kcal}</div>
+                <div style={{fontSize:10,color:'var(--t-3)'}}>kcal</div>
+              </div>}
+            </div>);
+          })}
+        </div>
+      </div>
+    </div>
+  </div>);
+}
+
+function MacroBar({label,v,t,color,unit}) {
+  const pct = Math.min(100, (v/t)*100);
+  return (<div>
+    <div style={{display:'flex',alignItems:'flex-end',gap:4,marginBottom:6}}>
+      <span className="hero-num" style={{fontSize:20,color:color}}>{v}</span>
+      <span style={{fontSize:10,color:'var(--t-3)',paddingBottom:2}}>/{t}{unit}</span>
+    </div>
+    <div className="bar" style={{height:4}}><span style={{width:`${pct}%`,background:color}}/></div>
+    <div style={{fontSize:10,color:'var(--t-3)',marginTop:4,letterSpacing:'0.08em',textTransform:'uppercase'}}>{label}</div>
+  </div>);
+}
+
+function WaterCard({ml,target,onAdd}) {
+  const pct = Math.min(1, ml/target);
+  return (<div className="card" style={{padding:22,display:'flex',flexDirection:'column'}}>
+    <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between'}}>
+      <div>
+        <div className="label">Water</div>
+        <div style={{display:'flex',alignItems:'flex-end',gap:4,marginTop:8}}>
+          <span className="hero-num" style={{fontSize:42,color:'var(--aqua)'}}>{(ml/1000).toFixed(2)}</span>
+          <span style={{fontSize:12,color:'var(--t-3)',paddingBottom:4}}>L / {target/1000}L</span>
+        </div>
+      </div>
+      <BottleMini pct={pct}/>
+    </div>
+    <div style={{display:'flex',gap:6,marginTop:18}}>
+      {[150,250,500,750].map(v => (<button key={v} onClick={() => onAdd(v)}
+        style={{flex:1,padding:'10px 0',borderRadius:10,background:'var(--bg-3)',border:'0.5px solid var(--line)',color:'var(--t-1)',cursor:'pointer',fontFamily:'inherit',fontSize:11,fontWeight:500}}>
+        +{v}
+      </button>))}
+    </div>
+    <div style={{fontSize:10.5,color:'var(--t-3)',marginTop:10,textAlign:'center',letterSpacing:'0.04em'}}>ml · reminds every hour</div>
+  </div>);
+}
+
+function BottleMini({pct}) {
+  const fillY = 8 + (88 * (1 - pct));
+  return (<svg width={68} height={110} viewBox="0 0 68 110">
+    <defs>
+      <clipPath id="bm-clip"><path d="M26 2 L42 2 L42 18 Q42 22 46 26 Q54 32 54 44 L54 100 Q54 106 48 106 L20 106 Q14 106 14 100 L14 44 Q14 32 22 26 Q26 22 26 18 Z"/></clipPath>
+    </defs>
+    <path d="M26 2 L42 2 L42 18 Q42 22 46 26 Q54 32 54 44 L54 100 Q54 106 48 106 L20 106 Q14 106 14 100 L14 44 Q14 32 22 26 Q26 22 26 18 Z" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.14)" strokeWidth="1"/>
+    <g clipPath="url(#bm-clip)">
+      <rect x="0" y={fillY} width="68" height="110" fill="var(--aqua)" style={{transition:'y 0.6s ease'}}/>
+      <path d={`M0 ${fillY} Q17 ${fillY-3} 34 ${fillY} T68 ${fillY} V${fillY+4} H0 Z`} fill="rgba(255,255,255,0.3)">
+        <animate attributeName="d" dur="3s" repeatCount="indefinite"
+          values={`M0 ${fillY} Q17 ${fillY-3} 34 ${fillY} T68 ${fillY} V${fillY+4} H0 Z;M0 ${fillY} Q17 ${fillY+2} 34 ${fillY-1} T68 ${fillY} V${fillY+4} H0 Z;M0 ${fillY} Q17 ${fillY-3} 34 ${fillY} T68 ${fillY} V${fillY+4} H0 Z`}/>
+      </path>
+    </g>
+  </svg>);
+}
+
+function MealLogger({ slot, picks, setPicks, logged, onLog, active }) {
+  const [open, setOpen] = React.useState(active);
+  const [selected, setSelected] = React.useState(new Set());
+  const plannedItems = slotPlannedItems(slot, picks);
+  const toggle = (it) => { const n = new Set(selected); n.has(it)?n.delete(it):n.add(it); setSelected(n); };
+  const logSelected = () => { if (selected.size>0) { onLog([...selected]); setSelected(new Set()); setOpen(false); } };
+  const logAll = () => { onLog(plannedItems); setOpen(false); };
+
+  return (<div className="card" style={{padding:0,overflow:'hidden',borderColor:active?'var(--lime)':'var(--line)'}}>
+    <button onClick={() => setOpen(!open)} style={{width:'100%',padding:'14px 16px',background:'transparent',border:'none',cursor:'pointer',fontFamily:'inherit',display:'flex',alignItems:'center',gap:12,textAlign:'left',color:'inherit'}}>
+      <div style={{width:32,height:32,borderRadius:10,background:logged?'var(--lime-d)':active?'var(--lime-d)':'var(--bg-3)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,color:logged?'var(--lime)':active?'var(--lime)':'var(--t-3)'}}>
+        {logged ? <Icon name="check" size={16} sw={2.5}/> : <Icon name="plate" size={16}/>}
+      </div>
+      <div style={{flex:1}}>
+        <div style={{display:'flex',alignItems:'center',gap:8}}>
+          <span style={{fontSize:14,fontWeight:600}}>{slot.name}</span>
+          <span style={{fontSize:11,color:'var(--t-3)'}}>{slot.time}</span>
+          {active && !logged && <span className="chip lime" style={{padding:'2px 7px',fontSize:10}}>Up now</span>}
+        </div>
+        <div style={{fontSize:11,color:'var(--t-3)',marginTop:3}}>
+          {logged ? `Logged ${logged.time}` : `${plannedItems.length} planned items`}
+        </div>
+      </div>
+      <Icon name={open?'chevronD':'chevronR'} size={16} color="var(--t-3)"/>
+    </button>
+
+    {open && !logged && <div style={{padding:'0 16px 16px',borderTop:'0.5px solid var(--line)'}}>
+      <div className="label" style={{margin:'14px 0 10px',fontSize:10}}>Check what you ate</div>
+      <div style={{display:'flex',flexDirection:'column',gap:6}}>
+        {plannedItems.map((it,i) => {
+          const n = NUTRITION[it] || [0];
+          const on = selected.has(it);
+          return (<div key={i} className={`opt ${on?'picked':''}`} onClick={() => toggle(it)}>
+            <div className="opt-check">{on && <Icon name="check" size={12} color="#0A0D0C" sw={3}/>}</div>
+            <div style={{flex:1}}>
+              <div className="opt-name">{it}</div>
+              <div className="opt-qty">{n[1]}g P · {n[2]}g C · {n[3]}g F</div>
+            </div>
+            <div className="opt-kcal">{n[0]}</div>
+          </div>);
+        })}
+      </div>
+      <div style={{display:'flex',gap:8,marginTop:12}}>
+        <button className="btn btn-ghost" style={{flex:1,fontSize:12}} onClick={logAll}>Log all planned</button>
+        <button className="btn btn-lime" style={{flex:2,fontSize:12}} disabled={selected.size===0} onClick={logSelected}>
+          Log {selected.size} selected
+        </button>
+      </div>
+    </div>}
+
+    {open && logged && <div style={{padding:'14px 16px',borderTop:'0.5px solid var(--line)'}}>
+      <div style={{fontSize:12,color:'var(--t-2)',marginBottom:8}}>Logged at {logged.time}</div>
+      <div style={{display:'flex',flexWrap:'wrap',gap:5}}>
+        {logged.items.map((it,i) => <span key={i} className="chip lime" style={{fontSize:10.5}}>{it}</span>)}
+      </div>
+    </div>}
+  </div>);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TAB 3: PEDOMETER & WORKOUT
+// ═══════════════════════════════════════════════════════════════
+function WorkoutTab({ state }) {
+  const { steps, setSteps, workouts, setWorkouts, today } = state;
+  const daySteps = steps[today] || 0;
+  const stepsTarget = 8000;
+  const dayWorkouts = workouts[today] || [];
+
+  const [timerOn, setTimerOn] = React.useState(false);
+  const [elapsed, setElapsed] = React.useState(0);
+
+  React.useEffect(() => {
+    if (!timerOn) return;
+    const t = setInterval(() => setElapsed(e => e+1), 1000);
+    return () => clearInterval(t);
+  }, [timerOn]);
+
+  const addWalk = (mins) => {
+    const kcal = Math.round(mins * 4.5);
+    setWorkouts({...workouts, [today]: [...dayWorkouts, { name:'Post-meal walk', dur:mins, kcal, time:new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false}) }]});
+  };
+  const addSteps = (n) => setSteps({...steps, [today]: daySteps + n});
+  const saveWorkout = () => {
+    if (elapsed < 30) return;
+    const mins = Math.round(elapsed/60);
+    addWalk(mins);
+    setElapsed(0); setTimerOn(false);
+  };
+
+  const walksDone = dayWorkouts.filter(w => w.name.includes('walk')).length;
+  const walksLeft = Math.max(0, 4 - walksDone);
+
+  return (<div className="fade-in">
+    <div className="topbar">
+      <div>
+        <div className="label">Movement · {new Date().toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'})}</div>
+        <h1 style={{fontSize:32,fontWeight:600,letterSpacing:'-0.02em',margin:'6px 0 0'}}>Pedometer & Workout</h1>
+        <div style={{fontSize:13,color:'var(--t-2)',marginTop:6}}>Prescribed: 15 min walking × 4 (post meals)</div>
+      </div>
+    </div>
+
+    <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14,marginBottom:20}}>
+      {/* Pedometer big card */}
+      <div className="card" style={{padding:24,display:'flex',flexDirection:'column',alignItems:'center'}}>
+        <div className="label" style={{alignSelf:'flex-start'}}>Today's steps</div>
+        <Ring size={200} stroke={14} value={daySteps/stepsTarget} color="var(--lime)">
+          <div style={{textAlign:'center'}}>
+            <div className="hero-num" style={{fontSize:48,color:'var(--t-1)'}}>{daySteps.toLocaleString()}</div>
+            <div style={{fontSize:11,color:'var(--t-3)',marginTop:4}}>of {stepsTarget.toLocaleString()}</div>
+          </div>
+        </Ring>
+        <div style={{fontSize:12,color:'var(--t-2)',marginTop:16,textAlign:'center',maxWidth:260,lineHeight:1.5}}>
+          {daySteps < stepsTarget
+            ? <>{(stepsTarget-daySteps).toLocaleString()} steps to go · <strong style={{color:'var(--amber)'}}>keep moving</strong></>
+            : <strong style={{color:'var(--lime)'}}>Target crushed. Keep going.</strong>}
+        </div>
+        <div style={{display:'flex',gap:8,marginTop:18,width:'100%'}}>
+          <button className="btn btn-ghost" style={{flex:1,fontSize:12}} onClick={() => addSteps(500)}>+500</button>
+          <button className="btn btn-ghost" style={{flex:1,fontSize:12}} onClick={() => addSteps(1000)}>+1000</button>
+          <button className="btn btn-ghost" style={{flex:1,fontSize:12}} onClick={() => addSteps(2000)}>+2000</button>
+        </div>
+      </div>
+
+      {/* Prescribed walks grid */}
+      <div className="card" style={{padding:22}}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',marginBottom:16}}>
+          <div>
+            <div className="label">Prescribed walks</div>
+            <div style={{fontSize:13,color:'var(--t-2)',marginTop:4}}>15 min · post each main meal</div>
+          </div>
+          <div>
+            <span className="hero-num" style={{fontSize:28,color:'var(--lime)'}}>{walksDone}</span>
+            <span style={{fontSize:13,color:'var(--t-3)'}}>/4</span>
+          </div>
+        </div>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:10,marginBottom:16}}>
+          {['After breakfast','After lunch','After snack','After dinner'].map((label,i) => {
+            const done = i < walksDone;
+            return (<div key={i} style={{padding:'14px 12px',borderRadius:12,background:done?'var(--lime-d)':'var(--bg-3)',border:`0.5px solid ${done?'var(--lime)':'var(--line)'}`,textAlign:'center'}}>
+              <Icon name="shoe" size={22} color={done?'var(--lime)':'var(--t-3)'} sw={1.5}/>
+              <div style={{fontSize:11,color:done?'var(--lime)':'var(--t-2)',marginTop:6,fontWeight:500}}>{label}</div>
+              <div style={{fontSize:10,color:'var(--t-3)',marginTop:2}}>15 min</div>
+            </div>);
+          })}
+        </div>
+
+        {/* Live timer */}
+        <div style={{padding:16,background:'var(--bg-3)',borderRadius:12,textAlign:'center'}}>
+          <div className="label" style={{marginBottom:10,fontSize:10}}>Live timer</div>
+          <div className="hero-num" style={{fontSize:44,color:'var(--t-1)',fontVariantNumeric:'tabular-nums'}}>
+            {String(Math.floor(elapsed/60)).padStart(2,'0')}:{String(elapsed%60).padStart(2,'0')}
+          </div>
+          <div style={{display:'flex',gap:6,marginTop:14,justifyContent:'center'}}>
+            <button className="btn btn-ghost" style={{fontSize:12,padding:'8px 14px'}} onClick={() => setTimerOn(!timerOn)}>
+              <Icon name={timerOn?'pause':'play'} size={12}/> {timerOn?'Pause':'Start'}
+            </button>
+            <button className="btn btn-lime" style={{fontSize:12,padding:'8px 14px'}} onClick={saveWorkout} disabled={elapsed<30}>
+              Save walk
+            </button>
+            <button className="btn btn-outline" style={{fontSize:12,padding:'8px 14px'}} onClick={() => setElapsed(0)}>Reset</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {/* Today's log */}
+    <div style={{display:'grid',gridTemplateColumns:'1.5fr 1fr',gap:14}}>
+      <div>
+        <div className="label" style={{marginBottom:12}}>Today's activity log</div>
+        <div className="card" style={{padding:0,overflow:'hidden'}}>
+          {dayWorkouts.length === 0 ? (
+            <div style={{padding:30,textAlign:'center',color:'var(--t-3)',fontSize:13}}>No activity logged yet. Start the timer after your next meal.</div>
+          ) : (
+            dayWorkouts.map((w,i,a) => (<div key={i} style={{padding:'14px 16px',display:'flex',alignItems:'center',gap:12,borderBottom:i<a.length-1?'0.5px solid var(--line)':'none'}}>
+              <div style={{width:38,height:38,borderRadius:10,background:'var(--lime-d)',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                <Icon name="shoe" size={18} color="var(--lime)"/>
+              </div>
+              <div style={{flex:1}}>
+                <div style={{fontSize:13.5,fontWeight:500}}>{w.name}</div>
+                <div style={{fontSize:11,color:'var(--t-3)',marginTop:2}}>{w.dur} min · logged {w.time}</div>
+              </div>
+              <div style={{textAlign:'right'}}>
+                <div className="hero-num" style={{fontSize:18,color:'var(--amber)'}}>{w.kcal}</div>
+                <div style={{fontSize:10,color:'var(--t-3)'}}>kcal burned</div>
+              </div>
+            </div>))
+          )}
+        </div>
+      </div>
+
+      <div>
+        <div className="label" style={{marginBottom:12}}>Weekly steps</div>
+        <WeekStepsBar steps={steps} today={today} target={stepsTarget}/>
+      </div>
+    </div>
+  </div>);
+}
+
+function WeekStepsBar({steps,today,target}) {
+  const days = [];
+  for (let i=6;i>=0;i--) {
+    const d = new Date(); d.setDate(d.getDate()-i);
+    const ds = d.toISOString().slice(0,10);
+    days.push({ label:d.toLocaleDateString('en-US',{weekday:'narrow'}), date:ds, val: steps[ds] ?? (i===0?0:Math.round(4000+Math.random()*5000)) });
+  }
+  const max = Math.max(target, ...days.map(d=>d.val));
+  return (<div className="card" style={{padding:20}}>
+    <div style={{display:'flex',alignItems:'flex-end',gap:8,height:140}}>
+      {days.map((d,i) => {
+        const isToday = d.date === today;
+        const h = (d.val/max)*100;
+        return (<div key={i} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:6,height:'100%'}}>
+          <div style={{flex:1,width:'100%',display:'flex',alignItems:'flex-end'}}>
+            <div style={{width:'100%',height:`${Math.max(h,3)}%`,borderRadius:6,background:isToday?'var(--lime)':d.val>=target?'var(--lime-d)':'var(--bg-3)',border:isToday?'none':'0.5px solid var(--line)',position:'relative'}}/>
+          </div>
+          <div style={{fontSize:10,color:isToday?'var(--t-1)':'var(--t-3)',fontWeight:isToday?600:400}}>{d.label}</div>
+        </div>);
+      })}
+    </div>
+    <div style={{marginTop:14,paddingTop:14,borderTop:'0.5px solid var(--line)',fontSize:11.5,color:'var(--t-2)',display:'flex',justifyContent:'space-between'}}>
+      <span>Avg this week</span>
+      <span className="hero-num" style={{fontSize:15,color:'var(--t-1)'}}>{Math.round(days.reduce((s,d)=>s+d.val,0)/7).toLocaleString()}</span>
+    </div>
+  </div>);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TAB 4: METRICS (real-time)
+// ═══════════════════════════════════════════════════════════════
+function MetricsTab({ state }) {
+  const { log, water, steps, weight, today } = state;
+  const [range, setRange] = React.useState('day');
+
+  const dayLog = log[today] || {};
+  const totals = dayTotals(dayLog);
+  const dayWater = water[today] || 0;
+  const daySteps = steps[today] || 0;
+
+  // adherence: logged slots / total slots
+  const adherence = Math.round((Object.keys(dayLog).length / MEAL_SLOTS.length) * 100);
+
+  return (<div className="fade-in">
+    <div className="topbar">
+      <div>
+        <div className="label">Progress · real-time</div>
+        <h1 style={{fontSize:32,fontWeight:600,letterSpacing:'-0.02em',margin:'6px 0 0'}}>Metrics</h1>
+        <div style={{fontSize:13,color:'var(--t-2)',marginTop:6}}>Live as you log. Against Dr. Latha's plan.</div>
+      </div>
+      <div style={{display:'flex',gap:4,padding:4,background:'var(--bg-2)',borderRadius:10,border:'0.5px solid var(--line)'}}>
+        {['day','week','month','year'].map(r => (<button key={r} onClick={() => setRange(r)}
+          style={{padding:'8px 14px',borderRadius:7,background:range===r?'var(--bg-4)':'transparent',color:range===r?'var(--t-1)':'var(--t-3)',border:'none',cursor:'pointer',fontSize:12,fontWeight:range===r?600:500,textTransform:'capitalize',fontFamily:'inherit'}}>{r}</button>))}
+      </div>
+    </div>
+
+    {/* KPI row */}
+    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(190px,1fr))',gap:12,marginBottom:20}}>
+      <KPI label="Calories consumed" value={totals.kcal} unit={`/ ${TARGETS.kcal}`} color="var(--lime)" pct={totals.kcal/TARGETS.kcal}/>
+      <KPI label="Protein" value={totals.p} unit={`/ ${TARGETS.p}g`} color="var(--aqua)" pct={totals.p/TARGETS.p}/>
+      <KPI label="Water" value={(dayWater/1000).toFixed(2)} unit={`/ ${PLAN_META.waterTarget/1000}L`} color="var(--violet)" pct={dayWater/PLAN_META.waterTarget}/>
+      <KPI label="Steps" value={daySteps.toLocaleString()} unit="/ 8,000" color="var(--amber)" pct={daySteps/8000}/>
+      <KPI label="Plan adherence" value={adherence} unit="%" color="var(--lime)" pct={adherence/100}/>
+    </div>
+
+    <div style={{display:'grid',gridTemplateColumns:'1.5fr 1fr',gap:14,marginBottom:20}}>
+      {/* 28-day adherence heatmap */}
+      <div className="card" style={{padding:20}}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',marginBottom:14}}>
+          <div>
+            <div className="label">Last 28 days · plan adherence</div>
+            <div style={{fontSize:11.5,color:'var(--t-3)',marginTop:4}}>Based on meals logged vs prescribed</div>
+          </div>
+          <span className="chip lime"><Icon name="trend" size={11} sw={2}/> 84% avg</span>
+        </div>
+        <Heatmap log={log} today={today}/>
+      </div>
+
+      {/* Weight trend */}
+      <div className="card" style={{padding:20}}>
+        <div className="label" style={{marginBottom:10}}>Weight · 12 weeks</div>
+        <div style={{display:'flex',alignItems:'flex-end',gap:6,marginBottom:10}}>
+          <span className="hero-num" style={{fontSize:36,color:'var(--t-1)'}}>{(weight[today]||88.2).toFixed(1)}</span>
+          <span style={{fontSize:13,color:'var(--t-3)',paddingBottom:4}}>kg</span>
+          <span style={{flex:1}}/>
+          <span className="chip amber" style={{fontSize:10}}>goal 80kg</span>
+        </div>
+        <WeightChart/>
+      </div>
+    </div>
+
+    {/* Today's macro breakdown per meal */}
+    <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14}}>
+      <div className="card" style={{padding:20}}>
+        <div className="label" style={{marginBottom:14}}>Today · per-meal breakdown</div>
+        <div style={{display:'flex',flexDirection:'column',gap:12}}>
+          {MEAL_SLOTS.map(slot => {
+            const m = dayLog[slot.id];
+            const n = m ? sumNutrition(m.items) : null;
+            const pct = n ? (n.kcal/TARGETS.kcal)*100 : 0;
+            return (<div key={slot.id}>
+              <div style={{display:'flex',alignItems:'baseline',gap:8,marginBottom:6}}>
+                <span style={{fontSize:12,fontWeight:500,color:m?'var(--t-1)':'var(--t-4)'}}>{slot.name}</span>
+                <span style={{flex:1}}/>
+                {n ? (<>
+                  <span className="hero-num" style={{fontSize:15,color:'var(--lime)'}}>{n.kcal}</span>
+                  <span style={{fontSize:10,color:'var(--t-3)'}}>kcal · {n.p}g P</span>
+                </>) : (<span style={{fontSize:10,color:'var(--t-4)'}}>not logged</span>)}
+              </div>
+              <div className="bar" style={{height:4}}><span style={{width:`${Math.min(100,pct*5)}%`,background:m?'var(--lime)':'var(--bg-4)'}}/></div>
+            </div>);
+          })}
+        </div>
+      </div>
+
+      <div className="card" style={{padding:20}}>
+        <div className="label" style={{marginBottom:14}}>Missed today</div>
+        {(() => {
+          const missed = MEAL_SLOTS.filter(s => !dayLog[s.id]);
+          const hour = new Date().getHours();
+          const overdue = missed.filter(s => {
+            const h = parseInt(s.time.split(':')[0]);
+            return h < hour;
+          });
+          if (overdue.length === 0) return <div style={{fontSize:12,color:'var(--t-2)',lineHeight:1.6}}>Nothing missed. On track for a clean day.</div>;
+          return (<div style={{display:'flex',flexDirection:'column',gap:10}}>
+            {overdue.map(s => (<div key={s.id} style={{display:'flex',alignItems:'center',gap:10,padding:'10px 12px',background:'var(--amber-d)',borderRadius:10}}>
+              <Icon name="alert" size={14} color="var(--amber)"/>
+              <div style={{flex:1}}>
+                <div style={{fontSize:12.5,fontWeight:600,color:'var(--amber)'}}>{s.name} overdue</div>
+                <div style={{fontSize:11,color:'var(--t-2)',marginTop:2}}>Scheduled for {s.time}</div>
+              </div>
+            </div>))}
+            <div className="coach" style={{fontSize:15,color:'var(--t-2)',marginTop:6,lineHeight:1.4}}>
+              Log it or we shift the day.
+            </div>
+          </div>);
+        })()}
+      </div>
+    </div>
+  </div>);
+}
+
+function KPI({label,value,unit,color,pct=0}) {
+  return (<div className="card" style={{padding:16}}>
+    <div className="label" style={{marginBottom:8}}>{label}</div>
+    <div style={{display:'flex',alignItems:'flex-end',gap:5,marginBottom:10}}>
+      <span className="hero-num" style={{fontSize:28,color}}>{value}</span>
+      <span style={{fontSize:11,color:'var(--t-3)',paddingBottom:3}}>{unit}</span>
+    </div>
+    <div className="bar" style={{height:3}}><span style={{width:`${Math.min(100,pct*100)}%`,background:color}}/></div>
+  </div>);
+}
+
+function Heatmap({ log, today }) {
+  const cells = [];
+  for (let i=27;i>=0;i--) {
+    const d = new Date(); d.setDate(d.getDate()-i);
+    const ds = d.toISOString().slice(0,10);
+    const entry = log[ds];
+    let v;
+    if (ds === today) {
+      v = entry ? Object.keys(entry).length/MEAL_SLOTS.length : 0;
+    } else {
+      // synthetic historical adherence
+      v = entry ? Object.keys(entry).length/MEAL_SLOTS.length : (0.55 + Math.random()*0.45);
+    }
+    cells.push({ date: ds, val: v, today: ds===today });
+  }
+  return (<>
+    <div style={{display:'grid',gridTemplateColumns:'repeat(14,1fr)',gap:4}}>
+      {cells.map((c,i) => (<div key={i} title={`${c.date} — ${Math.round(c.val*100)}%`} style={{
+        aspectRatio:'1',borderRadius:4,
+        background: c.val>=0.9?'var(--lime)':c.val>=0.7?'color-mix(in oklab, var(--lime) 60%, var(--bg-3))':c.val>=0.5?'color-mix(in oklab, var(--amber) 50%, var(--bg-3))':'color-mix(in oklab, var(--rose) 40%, var(--bg-3))',
+        border:c.today?'1.5px solid var(--t-1)':'none',
+      }}/>))}
+    </div>
+    <div style={{display:'flex',alignItems:'center',gap:6,marginTop:12,fontSize:10.5,color:'var(--t-3)'}}>
+      <span>Less</span>
+      {[0.3,0.55,0.75,0.95].map((v,i) => (<div key={i} style={{width:14,height:14,borderRadius:3,background:v>=0.9?'var(--lime)':v>=0.7?'color-mix(in oklab, var(--lime) 60%, var(--bg-3))':v>=0.5?'color-mix(in oklab, var(--amber) 50%, var(--bg-3))':'color-mix(in oklab, var(--rose) 40%, var(--bg-3))'}}/>))}
+      <span>Full plan</span>
+    </div>
+  </>);
+}
+
+function WeightChart() {
+  const data = [91.5, 91.0, 90.6, 90.2, 89.7, 89.3, 89.0, 88.7, 88.5, 88.4, 88.3, 88.2];
+  const W=300, H=100, pad=6;
+  const mn=Math.min(...data)-0.5, mx=Math.max(...data)+0.5;
+  const pts = data.map((v,i) => [pad+i/(data.length-1)*(W-pad*2), pad+(1-(v-mn)/(mx-mn))*(H-pad*2)]);
+  const path = pts.map(([x,y],i) => `${i===0?'M':'L'}${x.toFixed(1)} ${y.toFixed(1)}`).join(' ');
+  const area = path + ` L${pts[pts.length-1][0]} ${H-pad} L${pts[0][0]} ${H-pad} Z`;
+  return (<svg viewBox={`0 0 ${W} ${H}`} style={{width:'100%',height:H,display:'block'}}>
+    <defs><linearGradient id="wg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stopColor="oklch(0.86 0.17 128)" stopOpacity="0.3"/>
+      <stop offset="100%" stopColor="oklch(0.86 0.17 128)" stopOpacity="0"/>
+    </linearGradient></defs>
+    <path d={area} fill="url(#wg)"/>
+    <path d={path} fill="none" stroke="var(--lime)" strokeWidth="2" strokeLinecap="round"/>
+    {pts.map(([x,y],i) => <circle key={i} cx={x} cy={y} r={i===pts.length-1?4:2} fill={i===pts.length-1?'var(--lime)':'var(--bg-0)'} stroke="var(--lime)" strokeWidth="1.5"/>)}
+  </svg>);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// APP SHELL
+// ═══════════════════════════════════════════════════════════════
+const TABS = [
+  { id:'meal',    label:'Meal plan',        icon:'calendar' },
+  { id:'food',    label:'Food & water',     icon:'plate' },
+  { id:'workout', label:'Pedometer/Workout',icon:'shoe' },
+  { id:'metrics', label:'Metrics',          icon:'chart' },
+];
+
+function App() {
+  const state = useAppState();
+  const [showTweaks, setShowTweaks] = React.useState(false);
+
+  React.useEffect(() => {
+    const onMsg = (e) => {
+      const d = e.data || {};
+      if (d.type === '__activate_edit_mode') setShowTweaks(true);
+      if (d.type === '__deactivate_edit_mode') setShowTweaks(false);
+    };
+    window.addEventListener('message', onMsg);
+    window.parent.postMessage({ type:'__edit_mode_available' }, '*');
+    return () => window.removeEventListener('message', onMsg);
+  }, []);
+
+  const Body = {
+    meal:    <MealPlanTab state={state} onSwitch={state.setActiveTab}/>,
+    food:    <FoodWaterTab state={state}/>,
+    workout: <WorkoutTab state={state}/>,
+    metrics: <MetricsTab state={state}/>,
+  }[state.activeTab];
+
+  return (<div className="shell">
+    <aside className="sidebar">
+      <div className="brand">
+        <div className="brand-logo"><Icon name="flame" size={16} color="#0A0D0C" sw={2.5}/></div>
+        <div>
+          <div className="brand-name">Coach</div>
+          <div style={{fontSize:10,color:'var(--t-3)',letterSpacing:'0.06em'}}>Surya · Wk 3</div>
+        </div>
+      </div>
+      <div className="nav-section">Tracker</div>
+      {TABS.map(t => (<button key={t.id} data-screen-label={`0${TABS.indexOf(t)+1} ${t.label}`} className={`nav-item ${state.activeTab===t.id?'active':''}`} onClick={() => state.setActiveTab(t.id)}>
+        <Icon name={t.icon} size={16} color="var(--t-3)"/>
+        <span className="nav-label">{t.label}</span>
+      </button>))}
+
+      <div className="nav-section">Plan</div>
+      <div style={{padding:'8px 12px',fontSize:11.5,color:'var(--t-3)',lineHeight:1.5}}>
+        <div style={{color:'var(--t-2)',fontWeight:500}}>{PLAN_META.counselor}</div>
+        <div style={{marginTop:2}}>{PLAN_META.prescribed.split(',')[0]}</div>
+        <div style={{marginTop:6,fontSize:10}}>Next review {PLAN_META.reviewDate}</div>
+      </div>
+
+      <div style={{flex:1,minHeight:20}}/>
+      <div className="bottom-info" style={{padding:'12px',borderTop:'0.5px solid var(--line)',marginTop:12,display:'flex',alignItems:'center',gap:10}}>
+        <div style={{width:30,height:30,borderRadius:999,background:'var(--bg-4)',color:'var(--lime)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:600}}>ST</div>
+        <div style={{flex:1,minWidth:0}}>
+          <div style={{fontSize:12,fontWeight:500,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>Surya Teja</div>
+          <div style={{fontSize:10,color:'var(--t-3)'}}>{PLAN_META.umr}</div>
+        </div>
+      </div>
+    </aside>
+
+    <main className="main">{Body}</main>
+
+    {showTweaks && <TweaksPanel state={state}/>}
+  </div>);
+}
+
+function TweaksPanel({ state }) {
+  const { density, setDensity } = state;
+  const setAndPersist = (v) => {
+    setDensity(v);
+    window.parent.postMessage({type:'__edit_mode_set_keys', edits:{ density:v }}, '*');
+  };
+  return (<div style={{position:'fixed',bottom:20,right:20,zIndex:100,width:260,padding:16,background:'rgba(21,25,26,0.95)',backdropFilter:'blur(16px)',border:'0.5px solid var(--line-s)',borderRadius:14,boxShadow:'0 20px 60px rgba(0,0,0,0.4)'}}>
+    <div className="label" style={{marginBottom:12}}>Tweaks</div>
+    <div style={{marginBottom:12}}>
+      <div style={{fontSize:12,color:'var(--t-2)',marginBottom:6}}>Layout density</div>
+      <div style={{display:'flex',gap:4,padding:3,background:'var(--bg-1)',borderRadius:8,border:'0.5px solid var(--line)'}}>
+        {['spacious','compact'].map(v => (<button key={v} onClick={() => setAndPersist(v)}
+          style={{flex:1,padding:'7px 6px',borderRadius:6,background:density===v?'var(--bg-4)':'transparent',color:density===v?'var(--t-1)':'var(--t-3)',border:'none',cursor:'pointer',fontFamily:'inherit',fontSize:11,fontWeight:500,textTransform:'capitalize'}}>{v}</button>))}
+      </div>
+    </div>
+    <div style={{fontSize:11,color:'var(--t-3)',lineHeight:1.5,paddingTop:12,borderTop:'0.5px solid var(--line)'}}>
+      Data is stored in your browser (localStorage). For the desktop app, install as a PWA from your browser menu.
+    </div>
+  </div>);
+}
+
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "density": "compact"
+}/*EDITMODE-END*/;
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+
+</body>
+</html>
