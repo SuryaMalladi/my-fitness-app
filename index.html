@@ -2,8 +2,16 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Coach — Surya's Wellness</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>My Fitness</title>
+<!-- PWA -->
+<link rel="manifest" href="manifest.json"/>
+<meta name="theme-color" content="#0A0D0C"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="My Fitness"/>
+<link rel="apple-touch-icon" href="icon-192.png"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
@@ -263,7 +271,7 @@ const saveState = (s) => localStorage.setItem(LSKEY, JSON.stringify(s));
 function useAppState() {
   const init = loadState();
   const today = new Date().toISOString().slice(0,10);
-  const [activeTab, setActiveTab] = React.useState(init.activeTab || 'meal');
+  const [activeTab, setActiveTab] = React.useState(init.activeTab || 'food');
   // log shape: { 'YYYY-MM-DD': { slotId: { items: [itemName, ...], time: 'HH:MM' } } }
   const [log, setLog] = React.useState(init.log || {});
   const [water, setWater] = React.useState(init.water || {}); // { date: ml }
@@ -420,7 +428,7 @@ function MealPlanTab({ state, onSwitch }) {
     {/* Meal slots */}
     <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(360px,1fr))',gap:14}}>
       {MEAL_SLOTS.map(slot => (
-        <MealSlotCard key={slot.id} slot={slot} picks={picks} setPicks={setPicks}/>
+        <MealPlanSlotCard key={slot.id} slot={slot} picks={picks} setPicks={setPicks}/>
       ))}
     </div>
 
@@ -432,7 +440,7 @@ function MealPlanTab({ state, onSwitch }) {
   </div>);
 }
 
-function MealSlotCard({ slot, picks, setPicks }) {
+function MealPlanSlotCard({ slot, picks, setPicks }) {
   const items = slotPlannedItems(slot, picks);
   const n = sumNutrition(items);
 
@@ -596,143 +604,164 @@ function ReviewView({ onDone }) {
 // ═══════════════════════════════════════════════════════════════
 function FoodWaterTab({ state }) {
   const { log, setLog, water, setWater, today } = state;
-  const [picks, setPicks] = React.useState(() => loadState().picks || {});
-  const dayLog = log[today] || {};
-  const dayWater = water[today] || 0;
+  const [view, setView] = React.useState('day');
+  const [dateOffset, setDateOffset] = React.useState(0);
+
+  const dateStr = React.useMemo(() => {
+    const d = new Date(); d.setDate(d.getDate() + dateOffset);
+    return d.toISOString().slice(0,10);
+  }, [dateOffset]);
+
+  const dayLog = log[dateStr] || {};
+  const dayWater = water[dateStr] || 0;
   const totals = dayTotals(dayLog);
 
   const logMeal = (slotId, items) => {
     const time = new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false});
-    setLog({ ...log, [today]: { ...dayLog, [slotId]: { items, time } } });
+    setLog({...log, [dateStr]: {...(log[dateStr]||{}), [slotId]: {items, time}}});
   };
-  const addWater = (ml) => setWater({ ...water, [today]: Math.max(0, dayWater + ml) });
+  const addWater = (ml) => setWater({...water, [dateStr]: Math.max(0, dayWater + ml)});
 
-  const hour = new Date().getHours();
-  const activeSlot = MEAL_SLOTS.find(s => {
-    const [h] = s.time.split(/[–-]/)[0].split(':').map(Number);
-    return hour <= h + 1;
-  }) || MEAL_SLOTS[MEAL_SLOTS.length-1];
+  const fmtDate = (off) => {
+    if (off === 0) return 'Today';
+    if (off === -1) return 'Yesterday';
+    if (off === 1) return 'Tomorrow';
+    const d = new Date(); d.setDate(d.getDate() + off);
+    return d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+  };
+  const subDate = React.useMemo(() => {
+    const d = new Date(); d.setDate(d.getDate() + dateOffset);
+    return d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+  }, [dateOffset]);
 
   return (<div className="fade-in">
     <div className="topbar">
-      <div>
-        <div className="label">Today · {new Date().toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'})}</div>
-        <h1 style={{fontSize:32,fontWeight:600,letterSpacing:'-0.02em',margin:'6px 0 0'}}>Food & Water</h1>
-        <div style={{fontSize:13,color:'var(--t-2)',marginTop:6}}>Log what you actually ate from today's plan. Numbers update live.</div>
+      <div style={{flex:1}}>
+        <h1 style={{fontSize:28,fontWeight:600,letterSpacing:'-0.02em',margin:'0 0 16px'}}>Food & Water</h1>
+        <div style={{display:'inline-flex',padding:3,background:'var(--bg-2)',borderRadius:12,border:'0.5px solid var(--line)'}}>
+          {['day','week'].map(v => (
+            <button key={v} onClick={() => setView(v)} style={{
+              padding:'10px 32px',borderRadius:9,minHeight:44,
+              background:view===v?'var(--bg-4)':'transparent',
+              color:view===v?'var(--t-1)':'var(--t-3)',
+              border:'none',cursor:'pointer',fontFamily:'inherit',
+              fontSize:14,fontWeight:view===v?600:500,textTransform:'capitalize',
+            }}>{v.charAt(0).toUpperCase()+v.slice(1)}</button>
+          ))}
+        </div>
       </div>
     </div>
 
-    {/* Nutrition hero */}
-    <div style={{display:'grid',gridTemplateColumns:'1.4fr 1fr',gap:14,marginBottom:20}} className="main-grid">
-      <div className="card" style={{padding:22}}>
-        <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:18}}>
-          <div>
-            <div className="label">Consumed today</div>
-            <div style={{display:'flex',alignItems:'flex-end',gap:6,marginTop:8}}>
-              <span className="hero-num" style={{fontSize:56,color:'var(--lime)'}}>{totals.kcal}</span>
-              <span style={{fontSize:14,color:'var(--t-3)',paddingBottom:6}}>/ {TARGETS.kcal} kcal</span>
+    {view === 'day' && (<>
+      {/* Day navigation */}
+      <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:20}}>
+        <button onClick={() => setDateOffset(dateOffset-1)} style={{
+          width:44,height:44,borderRadius:12,background:'var(--bg-2)',
+          border:'0.5px solid var(--line)',cursor:'pointer',
+          display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,
+        }}><Icon name="chevronL" size={18} color="var(--t-2)"/></button>
+        <div style={{flex:1,textAlign:'center'}}>
+          <div style={{fontSize:17,fontWeight:600}}>{fmtDate(dateOffset)}</div>
+          <div style={{fontSize:11,color:'var(--t-3)',marginTop:2}}>{subDate}</div>
+        </div>
+        <button onClick={() => setDateOffset(dateOffset+1)} style={{
+          width:44,height:44,borderRadius:12,background:'var(--bg-2)',
+          border:'0.5px solid var(--line)',cursor:'pointer',
+          display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,
+        }}><Icon name="chevronR" size={18} color="var(--t-2)"/></button>
+      </div>
+
+      {/* Nutrition summary */}
+      <div className="card" style={{padding:20,marginBottom:20}}>
+        <div style={{display:'flex',alignItems:'center',gap:20,flexWrap:'wrap'}}>
+          <Ring size={76} stroke={7} value={totals.kcal/TARGETS.kcal}>
+            <div style={{textAlign:'center'}}>
+              <span className="hero-num" style={{fontSize:16}}>{Math.round(totals.kcal/TARGETS.kcal*100)}</span>
+              <span style={{fontSize:10,color:'var(--t-3)'}}>%</span>
             </div>
-            <div style={{marginTop:12,maxWidth:260}}>
-              <div className="bar"><span style={{width:`${Math.min(100,totals.kcal/TARGETS.kcal*100)}%`}}/></div>
+          </Ring>
+          <div style={{flex:1,minWidth:180}}>
+            <div style={{display:'flex',alignItems:'baseline',gap:6,marginBottom:10}}>
+              <span className="hero-num" style={{fontSize:40,color:'var(--lime)'}}>{totals.kcal}</span>
+              <span style={{fontSize:12,color:'var(--t-3)'}}>/ {TARGETS.kcal} kcal</span>
+            </div>
+            <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:14}}>
+              <MacroBar label="Protein" v={totals.p} t={TARGETS.p} color="var(--aqua)" unit="g"/>
+              <MacroBar label="Carbs"   v={totals.c} t={TARGETS.c} color="var(--lime)" unit="g"/>
+              <MacroBar label="Fat"     v={totals.f} t={TARGETS.f} color="var(--amber)" unit="g"/>
             </div>
           </div>
-          <Ring size={100} stroke={9} value={totals.kcal/TARGETS.kcal}>
-            <span className="hero-num" style={{fontSize:22}}>{Math.round(totals.kcal/TARGETS.kcal*100)}%</span>
-          </Ring>
         </div>
-        {/* Macros */}
-        <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:14,paddingTop:18,borderTop:'0.5px solid var(--line)'}}>
-          <MacroBar label="Protein" v={totals.p} t={TARGETS.p} color="var(--aqua)" unit="g"/>
-          <MacroBar label="Carbs"   v={totals.c} t={TARGETS.c} color="var(--lime)" unit="g"/>
-          <MacroBar label="Fat"     v={totals.f} t={TARGETS.f} color="var(--amber)" unit="g"/>
-          <MacroBar label="Fiber"   v={totals.fi} t={35}        color="var(--violet)" unit="g"/>
-        </div>
+      </div>
+
+      {/* Meals */}
+      <div className="label" style={{marginBottom:12}}>Meals</div>
+      <div style={{display:'flex',flexDirection:'column',gap:12,marginBottom:24}}>
+        {MEAL_SLOTS.map(slot => (
+          <MealSlotCard key={`${dateStr}-${slot.id}`} slot={slot}
+            logged={dayLog[slot.id]} onLog={(items) => logMeal(slot.id, items)}/>
+        ))}
       </div>
 
       {/* Water */}
-      <WaterCard ml={dayWater} target={PLAN_META.waterTarget} onAdd={addWater}/>
-    </div>
+      <WaterSection ml={dayWater} target={PLAN_META.waterTarget} onAdd={addWater}/>
+    </>)}
 
-    {/* Today's meal log */}
-    <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14}}>
-      <div>
-        <div className="label" style={{marginBottom:12}}>Log a meal · {activeSlot.name} is up</div>
-        <div style={{display:'flex',flexDirection:'column',gap:10}}>
-          {MEAL_SLOTS.map(slot => {
-            const logged = dayLog[slot.id];
-            return (<MealLogger key={slot.id} slot={slot} picks={picks} setPicks={setPicks} logged={logged}
-              onLog={(items) => logMeal(slot.id, items)}
-              active={slot.id === activeSlot.id && !logged}/>);
-          })}
-        </div>
-      </div>
-
-      <div>
-        <div className="label" style={{marginBottom:12}}>Today's timeline</div>
-        <div className="card" style={{padding:0,overflow:'hidden'}}>
-          {MEAL_SLOTS.map((slot,i) => {
-            const logged = dayLog[slot.id];
-            const n = logged ? sumNutrition(logged.items) : null;
-            return (<div key={slot.id} style={{padding:'14px 16px',display:'flex',alignItems:'flex-start',gap:12,borderBottom:i<MEAL_SLOTS.length-1?'0.5px solid var(--line)':'none',opacity:logged?1:0.55}}>
-              <div style={{width:46,fontSize:11,color:'var(--t-3)',fontVariantNumeric:'tabular-nums',paddingTop:1}}>{slot.time.split(/[–-]/)[0]}</div>
-              <div style={{width:20,height:20,borderRadius:6,background:logged?'var(--lime)':'var(--bg-3)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,marginTop:1}}>
-                {logged && <Icon name="check" size={11} color="#0A0D0C" sw={3}/>}
-              </div>
-              <div style={{flex:1}}>
-                <div style={{fontSize:13,fontWeight:600}}>{slot.name}</div>
-                <div style={{fontSize:11,color:'var(--t-3)',marginTop:2}}>
-                  {logged ? `Logged ${logged.time} · ${logged.items.length} items` : 'Not yet logged'}
-                </div>
-              </div>
-              {logged && <div style={{textAlign:'right',flexShrink:0}}>
-                <div className="hero-num" style={{fontSize:17,color:'var(--lime)'}}>{n.kcal}</div>
-                <div style={{fontSize:10,color:'var(--t-3)'}}>kcal</div>
-              </div>}
-            </div>);
-          })}
-        </div>
-      </div>
-    </div>
+    {view === 'week' && (
+      <WeekView log={log} water={water} today={today}
+        onDrillDown={(off) => { setDateOffset(off); setView('day'); }}/>
+    )}
   </div>);
 }
 
 function MacroBar({label,v,t,color,unit}) {
-  const pct = Math.min(100, (v/t)*100);
+  const pct = Math.min(100,(v/t)*100);
   return (<div>
-    <div style={{display:'flex',alignItems:'flex-end',gap:4,marginBottom:6}}>
-      <span className="hero-num" style={{fontSize:20,color:color}}>{v}</span>
-      <span style={{fontSize:10,color:'var(--t-3)',paddingBottom:2}}>/{t}{unit}</span>
+    <div style={{display:'flex',alignItems:'flex-end',gap:3,marginBottom:5}}>
+      <span className="hero-num" style={{fontSize:18,color}}>{v}</span>
+      <span style={{fontSize:10,color:'var(--t-3)',paddingBottom:1}}>/{t}{unit}</span>
     </div>
-    <div className="bar" style={{height:4}}><span style={{width:`${pct}%`,background:color}}/></div>
-    <div style={{fontSize:10,color:'var(--t-3)',marginTop:4,letterSpacing:'0.08em',textTransform:'uppercase'}}>{label}</div>
+    <div className="bar" style={{height:3}}><span style={{width:`${pct}%`,background:color}}/></div>
+    <div style={{fontSize:9.5,color:'var(--t-3)',marginTop:3,letterSpacing:'0.08em',textTransform:'uppercase'}}>{label}</div>
   </div>);
 }
 
-function WaterCard({ml,target,onAdd}) {
-  const pct = Math.min(1, ml/target);
-  return (<div className="card" style={{padding:22,display:'flex',flexDirection:'column'}}>
-    <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between'}}>
-      <div>
-        <div className="label">Water</div>
-        <div style={{display:'flex',alignItems:'flex-end',gap:4,marginTop:8}}>
-          <span className="hero-num" style={{fontSize:42,color:'var(--aqua)'}}>{(ml/1000).toFixed(2)}</span>
-          <span style={{fontSize:12,color:'var(--t-3)',paddingBottom:4}}>L / {target/1000}L</span>
+function WaterSection({ml,target,onAdd}) {
+  const pct = Math.min(1,ml/target);
+  return (<div>
+    <div className="label" style={{marginBottom:12}}>Water</div>
+    <div className="card" style={{padding:20}}>
+      <div style={{display:'flex',alignItems:'center',gap:16,flexWrap:'wrap'}}>
+        <BottleMini pct={pct}/>
+        <div style={{flex:1,minWidth:160}}>
+          <div style={{display:'flex',alignItems:'baseline',gap:6,marginBottom:8}}>
+            <span className="hero-num" style={{fontSize:42,color:'var(--aqua)'}}>{(ml/1000).toFixed(2)}</span>
+            <span style={{fontSize:12,color:'var(--t-3)'}}>L / {target/1000}L</span>
+          </div>
+          <div className="bar" style={{marginBottom:14}}>
+            <span style={{width:`${pct*100}%`,background:'var(--aqua)'}}/>
+          </div>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:6}}>
+            {[{ml:150,label:'Sip'},{ml:250,label:'Glass'},{ml:500,label:'Bottle'},{ml:750,label:'Large'}].map(q => (
+              <button key={q.ml} onClick={() => onAdd(q.ml)} style={{
+                padding:'10px 4px',borderRadius:10,minHeight:44,
+                background:'var(--bg-3)',border:'0.5px solid var(--line)',
+                color:'var(--t-1)',cursor:'pointer',fontFamily:'inherit',
+                display:'flex',flexDirection:'column',alignItems:'center',gap:3,
+              }}>
+                <span className="hero-num" style={{fontSize:14}}>+{q.ml}</span>
+                <span style={{fontSize:10,color:'var(--t-3)'}}>{q.label}</span>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
-      <BottleMini pct={pct}/>
     </div>
-    <div style={{display:'flex',gap:6,marginTop:18}}>
-      {[150,250,500,750].map(v => (<button key={v} onClick={() => onAdd(v)}
-        style={{flex:1,padding:'10px 0',borderRadius:10,background:'var(--bg-3)',border:'0.5px solid var(--line)',color:'var(--t-1)',cursor:'pointer',fontFamily:'inherit',fontSize:11,fontWeight:500}}>
-        +{v}
-      </button>))}
-    </div>
-    <div style={{fontSize:10.5,color:'var(--t-3)',marginTop:10,textAlign:'center',letterSpacing:'0.04em'}}>ml · reminds every hour</div>
   </div>);
 }
 
 function BottleMini({pct}) {
-  const fillY = 8 + (88 * (1 - pct));
+  const fillY = 8+(88*(1-pct));
   return (<svg width={68} height={110} viewBox="0 0 68 110">
     <defs>
       <clipPath id="bm-clip"><path d="M26 2 L42 2 L42 18 Q42 22 46 26 Q54 32 54 44 L54 100 Q54 106 48 106 L20 106 Q14 106 14 100 L14 44 Q14 32 22 26 Q26 22 26 18 Z"/></clipPath>
@@ -748,62 +777,254 @@ function BottleMini({pct}) {
   </svg>);
 }
 
-function MealLogger({ slot, picks, setPicks, logged, onLog, active }) {
-  const [open, setOpen] = React.useState(active);
-  const [selected, setSelected] = React.useState(new Set());
-  const plannedItems = slotPlannedItems(slot, picks);
-  const toggle = (it) => { const n = new Set(selected); n.has(it)?n.delete(it):n.add(it); setSelected(n); };
-  const logSelected = () => { if (selected.size>0) { onLog([...selected]); setSelected(new Set()); setOpen(false); } };
-  const logAll = () => { onLog(plannedItems); setOpen(false); };
+function MealSlotCard({ slot, logged, onLog }) {
+  const plannedItems = React.useMemo(() => slotPlannedItems(slot, {}), [slot.id]);
+  const [qtys, setQtys] = React.useState(() =>
+    Object.fromEntries(plannedItems.map((_,i) => [i, 1]))
+  );
 
-  return (<div className="card" style={{padding:0,overflow:'hidden',borderColor:active?'var(--lime)':'var(--line)'}}>
-    <button onClick={() => setOpen(!open)} style={{width:'100%',padding:'14px 16px',background:'transparent',border:'none',cursor:'pointer',fontFamily:'inherit',display:'flex',alignItems:'center',gap:12,textAlign:'left',color:'inherit'}}>
-      <div style={{width:32,height:32,borderRadius:10,background:logged?'var(--lime-d)':active?'var(--lime-d)':'var(--bg-3)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,color:logged?'var(--lime)':active?'var(--lime)':'var(--t-3)'}}>
-        {logged ? <Icon name="check" size={16} sw={2.5}/> : <Icon name="plate" size={16}/>}
-      </div>
-      <div style={{flex:1}}>
-        <div style={{display:'flex',alignItems:'center',gap:8}}>
-          <span style={{fontSize:14,fontWeight:600}}>{slot.name}</span>
-          <span style={{fontSize:11,color:'var(--t-3)'}}>{slot.time}</span>
-          {active && !logged && <span className="chip lime" style={{padding:'2px 7px',fontSize:10}}>Up now</span>}
-        </div>
-        <div style={{fontSize:11,color:'var(--t-3)',marginTop:3}}>
-          {logged ? `Logged ${logged.time}` : `${plannedItems.length} planned items`}
-        </div>
-      </div>
-      <Icon name={open?'chevronD':'chevronR'} size={16} color="var(--t-3)"/>
-    </button>
+  const setQty = (i, v) => setQtys(q => ({...q, [i]: Math.max(0, v)}));
+  const toggle = (i) => setQty(i, qtys[i] > 0 ? 0 : 1);
 
-    {open && !logged && <div style={{padding:'0 16px 16px',borderTop:'0.5px solid var(--line)'}}>
-      <div className="label" style={{margin:'14px 0 10px',fontSize:10}}>Check what you ate</div>
-      <div style={{display:'flex',flexDirection:'column',gap:6}}>
-        {plannedItems.map((it,i) => {
-          const n = NUTRITION[it] || [0];
-          const on = selected.has(it);
-          return (<div key={i} className={`opt ${on?'picked':''}`} onClick={() => toggle(it)}>
-            <div className="opt-check">{on && <Icon name="check" size={12} color="#0A0D0C" sw={3}/>}</div>
-            <div style={{flex:1}}>
-              <div className="opt-name">{it}</div>
-              <div className="opt-qty">{n[1]}g P · {n[2]}g C · {n[3]}g F</div>
+  const selectedKcal = plannedItems.reduce((sum,it,i) => {
+    return sum + (NUTRITION[it]||[0])[0] * qtys[i];
+  }, 0);
+  const hasSelection = plannedItems.some((_,i) => qtys[i] > 0);
+
+  const handleLog = () => {
+    if (!hasSelection) return;
+    const items = plannedItems.flatMap((it,i) => Array(qtys[i]).fill(it));
+    onLog(items);
+  };
+
+  return (<div className="card" style={{padding:0,overflow:'hidden'}}>
+    {/* Header */}
+    <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',
+      padding:'14px 16px',borderBottom:'0.5px solid var(--line)'}}>
+      <div>
+        <div style={{fontSize:15,fontWeight:600}}>{slot.name}</div>
+        <div style={{fontSize:11,color:'var(--t-3)',marginTop:2}}>{slot.time}</div>
+      </div>
+      {logged
+        ? <span className="chip lime" style={{fontSize:11}}>✓ {logged.time}</span>
+        : <span className="hero-num" style={{fontSize:17,color:'var(--t-2)'}}>{Math.round(selectedKcal)} kcal</span>
+      }
+    </div>
+
+    {/* Items */}
+    <div>
+      {plannedItems.map((it,i) => {
+        const n = NUTRITION[it]||[0,0,0,0,0];
+        if (logged) {
+          const lq = logged.items.filter(x=>x===it).length;
+          return (<div key={i} style={{
+            display:'flex',alignItems:'center',gap:10,padding:'10px 16px',
+            borderBottom:i<plannedItems.length-1?'0.5px solid var(--line)':'none',
+            opacity:lq>0?1:0.4,
+          }}>
+            <div style={{width:22,height:22,borderRadius:7,flexShrink:0,
+              background:lq>0?'var(--lime)':'var(--bg-3)',
+              display:'flex',alignItems:'center',justifyContent:'center'}}>
+              {lq>0 && <Icon name="check" size={12} color="#0A0D0C" sw={3}/>}
             </div>
-            <div className="opt-kcal">{n[0]}</div>
+            <div style={{flex:1}}>
+              <div style={{fontSize:13,fontWeight:500}}>{it}</div>
+              <div style={{fontSize:11,color:'var(--t-3)',marginTop:1}}>
+                {lq>1?`×${lq} · `:''}
+                {n[1]}g P · {n[2]}g C · {n[3]}g F
+              </div>
+            </div>
+            <div className="hero-num" style={{fontSize:15,color:'var(--lime)'}}>{n[0]*lq}</div>
+          </div>);
+        }
+        const qty = qtys[i];
+        const eaten = qty > 0;
+        return (<div key={i} style={{
+          display:'flex',alignItems:'center',gap:10,padding:'10px 16px',
+          borderBottom:i<plannedItems.length-1?'0.5px solid var(--line)':'none',
+          opacity:eaten?1:0.45,transition:'opacity .15s',
+        }}>
+          <button onClick={() => toggle(i)} style={{
+            width:24,height:24,borderRadius:7,flexShrink:0,
+            background:eaten?'var(--lime)':'transparent',
+            border:eaten?'none':'1.5px solid var(--t-3)',
+            display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',
+          }}>
+            {eaten && <Icon name="check" size={13} color="#0A0D0C" sw={3}/>}
+          </button>
+          <div style={{flex:1,cursor:'pointer'}} onClick={() => toggle(i)}>
+            <div style={{fontSize:13,fontWeight:500,color:'var(--t-1)'}}>{it}</div>
+            <div style={{fontSize:11,color:'var(--t-3)',marginTop:1}}>
+              {n[1]}g P · {n[2]}g C · {n[3]}g F
+            </div>
+          </div>
+          <div style={{display:'flex',alignItems:'center',gap:4,flexShrink:0}}>
+            <button onClick={() => setQty(i,qty-1)} style={{
+              width:30,height:30,borderRadius:8,background:'var(--bg-3)',
+              border:'0.5px solid var(--line)',cursor:'pointer',
+              display:'flex',alignItems:'center',justifyContent:'center',
+            }}><Icon name="minus" size={13} color="var(--t-2)"/></button>
+            <span style={{width:18,textAlign:'center',fontSize:13,fontWeight:600}}>{qty}</span>
+            <button onClick={() => setQty(i,qty+1)} style={{
+              width:30,height:30,borderRadius:8,background:'var(--bg-3)',
+              border:'0.5px solid var(--line)',cursor:'pointer',
+              display:'flex',alignItems:'center',justifyContent:'center',
+            }}><Icon name="plus" size={13} color="var(--t-2)"/></button>
+          </div>
+          <div className="hero-num" style={{
+            fontSize:16,color:eaten?'var(--lime)':'var(--t-3)',
+            width:40,textAlign:'right',flexShrink:0,
+          }}>{n[0]*qty}</div>
+        </div>);
+      })}
+    </div>
+
+    {!logged && (<div style={{padding:'12px 16px',borderTop:'0.5px solid var(--line)'}}>
+      <button className="btn btn-lime" style={{width:'100%',minHeight:44}}
+        disabled={!hasSelection} onClick={handleLog}>
+        Log {slot.name}
+      </button>
+    </div>)}
+    {logged && (<div style={{padding:'10px 16px',background:'rgba(180,230,120,0.06)',
+      borderTop:'0.5px solid var(--line)'}}>
+      <div style={{fontSize:12,color:'var(--lime)',fontWeight:500}}>
+        Logged {logged.time} · {sumNutrition(logged.items).kcal} kcal
+      </div>
+    </div>)}
+  </div>);
+}
+
+function WeekView({ log, water, today, onDrillDown }) {
+  const [drill, setDrill] = React.useState(null);
+  const now = new Date();
+  const dow = now.getDay();
+  const mondayDiff = dow === 0 ? -6 : 1 - dow;
+
+  const week = Array.from({length:7}, (_,i) => {
+    const d = new Date(now);
+    d.setDate(now.getDate() + mondayDiff + i);
+    const ds = d.toISOString().slice(0,10);
+    const dayLog = log[ds] || {};
+    const dayWater = water[ds] || 0;
+    const tots = dayTotals(dayLog);
+    const loggedCount = Object.keys(dayLog).length;
+    const pct = loggedCount / MEAL_SLOTS.length;
+    const status = pct >= 0.8 ? 'on' : pct >= 0.4 ? 'part' : 'miss';
+    const offset = Math.round((d - new Date(now.toDateString())) / 86400000);
+    return { ds, d, offset, tots, dayWater, loggedCount, pct, status, isToday: ds === today };
+  });
+
+  const sc = { on:'var(--lime)', part:'var(--amber)', miss:'var(--rose)' };
+  const sl = { on:'On track', part:'Partial', miss:'Missed' };
+  const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const drillDay = drill ? week.find(w => w.ds === drill) : null;
+
+  return (<div>
+    <div className="label" style={{marginBottom:12}}>This week</div>
+    <div style={{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:6,marginBottom:16}}>
+      {week.map((day,i) => {
+        const isSel = drill === day.ds;
+        return (<button key={i} onClick={() => setDrill(isSel ? null : day.ds)} style={{
+          padding:'10px 4px 12px',borderRadius:12,minHeight:80,
+          background:isSel?'var(--lime-d)':day.isToday?'var(--bg-3)':'var(--bg-2)',
+          border:`0.5px solid ${isSel?'var(--lime)':day.isToday?'var(--line-s)':'var(--line)'}`,
+          cursor:'pointer',fontFamily:'inherit',
+          display:'flex',flexDirection:'column',alignItems:'center',gap:4,
+        }}>
+          <div style={{fontSize:10,color:day.isToday?'var(--lime)':'var(--t-3)',
+            fontWeight:day.isToday?600:400,letterSpacing:'0.04em'}}>{DAYS[i]}</div>
+          <div style={{fontSize:13,fontWeight:600,color:day.isToday?'var(--t-1)':'var(--t-2)'}}>{day.d.getDate()}</div>
+          <div style={{width:'100%',padding:'2px 4px'}}>
+            <div className="bar" style={{height:3}}>
+              <span style={{width:`${Math.min(100,day.tots.kcal/TARGETS.kcal*100)}%`}}/>
+            </div>
+          </div>
+          <div style={{width:7,height:7,borderRadius:999,
+            background:day.pct===0?'var(--bg-4)':sc[day.status]}}/>
+        </button>);
+      })}
+    </div>
+
+    <div style={{display:'flex',gap:14,marginBottom:20,fontSize:11,color:'var(--t-3)'}}>
+      {Object.entries(sl).map(([k,v]) => (
+        <div key={k} style={{display:'flex',alignItems:'center',gap:4}}>
+          <div style={{width:7,height:7,borderRadius:999,background:sc[k]}}/> {v}
+        </div>
+      ))}
+    </div>
+
+    {drillDay && (<div className="fade-in">
+      <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:14}}>
+        <div>
+          <div style={{fontSize:15,fontWeight:600}}>
+            {drillDay.d.toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'})}
+          </div>
+          <div style={{fontSize:11,color:sc[drillDay.status],marginTop:2}}>{sl[drillDay.status]}</div>
+        </div>
+        <button className="btn btn-ghost" style={{fontSize:12,padding:'8px 14px',minHeight:44}}
+          onClick={() => onDrillDown(drillDay.offset)}>
+          Log this day →
+        </button>
+      </div>
+
+      <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:10,marginBottom:14}}>
+        <div className="card" style={{padding:14,textAlign:'center'}}>
+          <div className="label" style={{marginBottom:6,fontSize:9}}>Calories</div>
+          <div className="hero-num" style={{fontSize:22,color:'var(--lime)'}}>{drillDay.tots.kcal}</div>
+          <div style={{fontSize:10,color:'var(--t-3)'}}>/ {TARGETS.kcal}</div>
+        </div>
+        <div className="card" style={{padding:14,textAlign:'center'}}>
+          <div className="label" style={{marginBottom:6,fontSize:9}}>Water</div>
+          <div className="hero-num" style={{fontSize:22,color:'var(--aqua)'}}>{(drillDay.dayWater/1000).toFixed(1)}</div>
+          <div style={{fontSize:10,color:'var(--t-3)'}}>/ {PLAN_META.waterTarget/1000}L</div>
+        </div>
+        <div className="card" style={{padding:14,textAlign:'center'}}>
+          <div className="label" style={{marginBottom:6,fontSize:9}}>Adherence</div>
+          <div className="hero-num" style={{fontSize:22,color:sc[drillDay.status]}}>{Math.round(drillDay.pct*100)}%</div>
+          <div style={{fontSize:10,color:sc[drillDay.status]}}>{sl[drillDay.status]}</div>
+        </div>
+      </div>
+
+      <div className="card" style={{padding:0,overflow:'hidden'}}>
+        {MEAL_SLOTS.map((slot,i) => {
+          const dayLog = log[drillDay.ds] || {};
+          const logged = dayLog[slot.id];
+          const planned = slotPlannedItems(slot,{});
+          const n = logged ? sumNutrition(logged.items) : null;
+          return (<div key={slot.id} style={{
+            padding:'12px 16px',
+            borderBottom:i<MEAL_SLOTS.length-1?'0.5px solid var(--line)':'none',
+            display:'flex',gap:12,alignItems:'center',opacity:logged?1:0.5,
+          }}>
+            <div style={{width:22,height:22,borderRadius:7,flexShrink:0,
+              background:logged?'var(--lime)':'var(--bg-3)',
+              display:'flex',alignItems:'center',justifyContent:'center'}}>
+              {logged && <Icon name="check" size={12} color="#0A0D0C" sw={3}/>}
+            </div>
+            <div style={{flex:1}}>
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline'}}>
+                <span style={{fontSize:13,fontWeight:600}}>{slot.name}</span>
+                <span style={{fontSize:11,color:'var(--t-3)'}}>{slot.time}</span>
+              </div>
+              {logged ? (
+                <div style={{fontSize:11,color:'var(--t-2)',marginTop:2}}>
+                  {logged.items.slice(0,3).join(' · ')}{logged.items.length>3?` +${logged.items.length-3} more`:''}
+                </div>
+              ) : (
+                <div style={{fontSize:11,color:'var(--t-3)',marginTop:2}}>{planned.length} prescribed · not logged</div>
+              )}
+            </div>
+            {n && <div className="hero-num" style={{fontSize:15,color:'var(--lime)',flexShrink:0}}>{n.kcal}</div>}
           </div>);
         })}
       </div>
-      <div style={{display:'flex',gap:8,marginTop:12}}>
-        <button className="btn btn-ghost" style={{flex:1,fontSize:12}} onClick={logAll}>Log all planned</button>
-        <button className="btn btn-lime" style={{flex:2,fontSize:12}} disabled={selected.size===0} onClick={logSelected}>
-          Log {selected.size} selected
-        </button>
-      </div>
-    </div>}
+    </div>)}
 
-    {open && logged && <div style={{padding:'14px 16px',borderTop:'0.5px solid var(--line)'}}>
-      <div style={{fontSize:12,color:'var(--t-2)',marginBottom:8}}>Logged at {logged.time}</div>
-      <div style={{display:'flex',flexWrap:'wrap',gap:5}}>
-        {logged.items.map((it,i) => <span key={i} className="chip lime" style={{fontSize:10.5}}>{it}</span>)}
+    {!drillDay && (
+      <div style={{textAlign:'center',padding:'32px 0',color:'var(--t-3)',fontSize:13}}>
+        Tap a day above to see details
       </div>
-    </div>}
+    )}
   </div>);
 }
 
@@ -1153,7 +1374,6 @@ function WeightChart() {
 // APP SHELL
 // ═══════════════════════════════════════════════════════════════
 const TABS = [
-  { id:'meal',    label:'Meal plan',        icon:'calendar' },
   { id:'food',    label:'Food & water',     icon:'plate' },
   { id:'workout', label:'Pedometer/Workout',icon:'shoe' },
   { id:'metrics', label:'Metrics',          icon:'chart' },
@@ -1175,7 +1395,6 @@ function App() {
   }, []);
 
   const Body = {
-    meal:    <MealPlanTab state={state} onSwitch={state.setActiveTab}/>,
     food:    <FoodWaterTab state={state}/>,
     workout: <WorkoutTab state={state}/>,
     metrics: <MetricsTab state={state}/>,
@@ -1245,6 +1464,16 @@ const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
 }/*EDITMODE-END*/;
 
 ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js')
+      .then(r => console.log('SW registered', r.scope))
+      .catch(e => console.warn('SW registration failed', e));
+  });
+}
 </script>
 
 </body>
